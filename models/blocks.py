@@ -14,15 +14,15 @@ class PlanModel(BaseModel):
 class EndpointModel(BaseModel):
     """Endpoint to get information from"""
     endpoint: Union[Dict[str, Any], Dict[str, str]] = Field(
-        description="An endpoint to send http request to. Should have keys like: http method, URL, path variables, necessary headers, body, etc."
+        description="An endpoint to send http request to. Should have keys like: http method, URL, path variables, queries, headers, body, etc."
     )
 
 class PlanExecute(TypedDict):
     input: str
     plan: List[str]
-    current_step: int
-    api_select: str
     past_steps: Annotated[List[Tuple], operator.add]
+    api: Annotated[List[dict], operator.add]
+    task: int
     response: str
 
 
@@ -34,6 +34,14 @@ class ResponseModel(BaseModel):
 
 class ActModel(BaseModel):
     """Action to perform."""
+    action: Union[ResponseModel, PlanModel] = Field(
+        description="Action to perform. If you want to respond to user, use Response. "
+        "If you need to further use tools to get the answer, use Plan."
+    )
+
+class Act(BaseModel):
+    """Action to perform."""
+
     action: Union[ResponseModel, PlanModel] = Field(
         description="Action to perform. If you want to respond to user, use Response. "
         "If you need to further use tools to get the answer, use Plan."

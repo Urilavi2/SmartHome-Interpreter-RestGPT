@@ -1,0 +1,6 @@
+models/__pycache__/
+.idea/
+class diagram.drawio
+test.py
+utils/__pycache__/
+.env
