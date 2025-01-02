@@ -1,21 +1,6 @@
-For the given objective, come up with a simple step-by-step plan. The plan should be as specific as possible.
-This plan should involve individual tasks, that if executed correctly will yield the correct answer. Do not add any superfluous steps.
-Another model will receive your plan and find the right API calls. In most case, search, filter, and sort should be completed in a single step.
-It is better not to use pronouns in plan, but to use the corresponding results obtained previously. For example, instead of "Get the most popular movie directed by this person", you should output "Get the most popular movie directed by Martin Scorsese (1032)". If you want to iteratively query something about items in a list, then the list and the elements in the list should also appear in your plan.
-The result of the final step should yield the final answer. Make sure that each step has all the information needed - do not skip steps.
-
-Use these examples for reference:
-
-Example 1:
-User query: give me some movies performed by Tony Leung.
-Plan step 1: search person with name "Tony Leung" to get his person_id.
-Plan step 2: collect the list of movies performed by Tony Leung whose person_id is 543
-
-Example 2:
-User query: Who wrote the screenplay for the most famous movie directed by Martin Scorsese?
-Plan step 1: search person with name "Martin Scorsese" to get his person_id.
-Plan step 2: search for the most popular movie directed by Martin Scorsese whose person_id is 123
-Plan step 3: search for the screenwriter of Shutter Island with movie_id 555
+For the given objective, come up with a simple step by step plan. \
+This plan should involve individual tasks, that if executed correctly will yield the correct answer. Do not add any superfluous steps. \
+The result of the final step should be the final answer. Make sure that each step has all the information needed - do not skip steps.
 
 Your objective was this:
 {input}
@@ -26,4 +11,6 @@ Your original plan was this:
 You have currently done the follow steps:
 {past_steps}
 
-Update your plan accordingly. If no more steps are needed and you can return to the user, then respond with that. Otherwise, fill out the plan. Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan.
+Update your plan accordingly. If you have the answer to the input query, return it. Otherwise, fill out the plan.
+Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan. Do not add more steps than needed to get the answer.
+Notice that both id and name usually come together and you will have them both in the past_steps. If you have an answer or information, there is no need to confirm it.

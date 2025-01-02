@@ -4,3 +4,6 @@ class diagram.drawio
 test.py
 utils/__pycache__/
 .env
+__pycache__/*
+logs/*
+!logs/.gitkeep
