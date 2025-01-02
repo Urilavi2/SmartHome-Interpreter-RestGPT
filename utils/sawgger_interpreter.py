@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple, Union
 
@@ -157,4 +158,26 @@ def reduce_openapi_spec(spec: dict, dereference: bool = True, only_required: boo
     )
 
 
+def fix_json_error(data: str, return_str=True):
+    data = data.strip().strip('"').strip(",").strip("`")
+    try:
+        json.loads(data)
+        return data
+    except json.decoder.JSONDecodeError:
+        data = data.split("\n")
+        data = [line.strip() for line in data]
+        for i in range(len(data)):
+            line = data[i]
+            if line in ['[', ']', '{', '}']:
+                continue
+            if line.endswith(('[', ']', '{', '}')):
+                continue
+            if not line.endswith(',') and data[i + 1] not in [']', '}', '],', '},']:
+                data[i] += ','
+            if data[i + 1] in [']', '}', '],', '},'] and line.endswith(','):
+                data[i] = line[:-1]
+        data = " ".join(data)
 
+        if not return_str:
+            data = json.loads(data)
+        return data

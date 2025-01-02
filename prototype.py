@@ -1,36 +1,36 @@
 import asyncio
 import json
+from copy import deepcopy
+from datetime import datetime
+from plistlib import dumps
+from utils.tools import http_toolkit
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv, find_dotenv
 from logging import getLogger, Logger
 from langchain_core.prompts import ChatPromptTemplate
+from prompts.prompt_reader import Prompts
 from models.blocks import *
 from utils.sawgger_interpreter import *
 from langgraph.graph import END, StateGraph, START
-from utils.tools import *
+from utils.caller_tools import get_response, get_action_and_input, get_matched_endpoint
 from PIL import Image
+import logging
 
-def read_prompt(prompt_type: str):
-    options = ["planner", "api_selector", "executer", "replanner"]
-    prompt_type = prompt_type.lower()
-    if prompt_type not in options:
-        raise ValueError(f"Invalid prompt type: {prompt_type}")
-    with open(f"prompts/{prompt_type}_prompt.txt", "r") as f:
-        return f.read()
+PROTOTYPE_level = 99
+logging.addLevelName(PROTOTYPE_level, "PROTOTYPE")
+logging.basicConfig(level=PROTOTYPE_level,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[
+                        logging.FileHandler(f"logs/{datetime.now().strftime('%H%M%S%d%m%Y')}.log"),
+                    ])
 
-def format_endpoints(api_ref: ReducedOpenAPISpec) -> str:
-    api_name_desc = [f"{endpoint[0]} {endpoint[1].split('.')[0] if endpoint[1] is not None else ''}" for endpoint in
-                     api_ref.endpoints]
-    api_name_desc = '\n'.join(api_name_desc)
-    api_name_desc = api_name_desc.replace('{', '{{').replace('}', '}}')
-    return api_name_desc
+def proto(self, message, *args, **kwargs):
+    if self.isEnabledFor(PROTOTYPE_level):
+        self._log(PROTOTYPE_level, message, args, **kwargs)
 
-def fetch_api_ref(path: str) -> ReducedOpenAPISpec:
-    with open(path) as f:
-        raw_tmdb_api_spec = json.load(f)
-    api_spec = reduce_openapi_spec(raw_tmdb_api_spec, only_required=False)
-    return api_spec
+logging.Logger.proto = proto
+logger = getLogger(__name__)
 
 def create_graph(g: StateGraph.compile):
     a = g.get_graph(xray=True).draw_mermaid_png()
@@ -38,92 +38,119 @@ def create_graph(g: StateGraph.compile):
         f.write(a)
     Image.open("graph.png").show()
 
-_ = load_dotenv(find_dotenv())
+async def prototype(*args, **kwargs):
+    entity = kwargs.get("entity",None)
+    if entity is None:
+        print("No entity specified")
+        exit(1)
 
-api_ref = fetch_api_ref("swagger/tmdb_oas.json")
-endpoints_desc = format_endpoints(api_ref)
+    if entity.lower() not in ["planner", "api", "executor", "full"]:
+        print("Entity not valid")
+        exit(2)
 
-planner_prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            f"""{read_prompt(prompt_type='planner')}""",
-        ),
-        ("placeholder", "{messages}"),
-    ]
-)
-api_selector_prompt = ChatPromptTemplate.from_template(read_prompt(prompt_type="api_selector"))
-api_selector_prompt = ChatPromptTemplate.format_prompt(api_selector_prompt, endpoints=endpoints_desc)
-api_selector_prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system",
-         api_selector_prompt.messages[0].content
-         ),
-        ("placeholder", "{messages}"),
-    ]
-)
+    entity = Entity[entity]
+    inputs = {"input": input(">> ")}
+    _ = load_dotenv(find_dotenv())
+    llm_model = "gpt-4o-mini"
+    prompts = Prompts()
+    caller_tools = http_toolkit()
 
-# replanner_prompt = ChatPromptTemplate.from_messages(
-#     [
-#         (
-#             "system",
-#             f"""{read_prompt(prompt_type='replanner')}""",
-#         ),
-#         ("placeholder", "{messages}"),
-#     ]
-# )
+    llm = ChatOpenAI(model=llm_model, temperature=0.0)
+    planner = prompts.planner | llm.with_structured_output(PlanModel)
+    api_selector = prompts.api_selector | llm.with_structured_output(EndpointModel)
+    agent_caller = create_react_agent(llm, caller_tools, state_modifier=prompts.caller)
+    parser = prompts.parser | llm.with_structured_output(ParserModel)
+    replanner = prompts.replanner | llm.with_structured_output(ActModel)
 
 
+    async def plan_step(state: PlanExecute):
+        logger.proto(f"input: {state["input"]}")
+        plan = await planner.ainvoke({"messages": [("user", state["input"])]})
+        logger.proto(f"the plan:\n{plan}\n")
+        return {"plan": plan.steps, "task": 0, "past_steps": [], "original_plan": plan.steps}
+
+    async def api_selector_step(state: PlanExecute):
+        task = state["plan"][0]
+        if entity.value == 2:
+            state["plan"] = state["plan"][1:]
+        logger.proto(f"The current step: {task}")
+        endpoint = await api_selector.ainvoke({"messages": [("user",task)]})
+        logger.proto(f"API Selector stage\n-----------------\
+                    API Request: {endpoint.endpoint}")
+        if entity.value == 2:
+            return {"api": [endpoint.endpoint], "task": state["task"] + 1, "plan": state["plan"]}
+        return {"api": [endpoint.endpoint], "task": state["task"] + 1}
+
+    async def caller_step(state: PlanExecute):
+        task = state["plan"][0]
+        formatted_task = {"http_request": state["api"][-1], "task": task, "past_steps": state["past_steps"]}
+        logger.proto(f"Caller Agent input: {formatted_task}")
+        call = await agent_caller.ainvoke({"messages": [("user",str(formatted_task))]})
+        logger.proto(f"Caller Response:\n---------------\n\
+        {call["messages"][-1].content}\n\n------------------------\n")
+        return {"current_agent_answer": call["messages"][-1].content}
+
+    async def parser_step(state: PlanExecute):
+        task = state["plan"][0]
+        input_for_parser = {"task": task, "api output": state["current_agent_answer"]}
+        parse = await parser.ainvoke({"messages": [("user", str(input_for_parser))]})
+        logger.proto(f"Parser Response:\n---------------\n\
+                     {parse}")
+        logger.proto(f"Past_steps: {task, state['past_steps']}")
+        if entity.value == 3:
+            return {"current_agent_answer": "", "past_steps": [(task, str(parse.res))], "plan": state["plan"][1:]}
+        return {"current_agent_answer": "", "past_steps": [(task, str(parse.res))]}
 
 
-planner = planner_prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0.0).with_structured_output(PlanModel)
-api_selector = api_selector_prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0).with_structured_output(EndpointModel)
-# replanner = replanner_prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0.0).with_structured_output(ActModel)
+    async def replan_step(state: PlanExecute):
+        output = await replanner.ainvoke(state)
+        output.more = bool(output.more)
+        if not output.more:
+            return {"response": output.response}
+        else:
+            logger.proto(f"Re-Plan stage:\nnew plan: {output.replan.steps}")
+            return {"plan": output.replan.steps}
+
+    def should_end(state: PlanExecute):
+        if "response" in state and state["response"] or len(state["plan"]) == 0:
+            try:
+                logger.proto(f"Final Response: {state["response"]}")
+            except:
+                pass
+            return END
+        else:
+            # return "agent"
+            return "API Selector"
+
+    workflow = StateGraph(PlanExecute)
+    workflow.add_node("Planner", plan_step)
+    workflow.add_edge(START, "Planner")
+    if entity.value > 1:
+        workflow.add_node("API Selector", api_selector_step)
+        workflow.add_edge("Planner", "API Selector")
+        if entity.value > 2:
+            workflow.add_node("Executor", caller_step)
+            workflow.add_edge("API Selector", "Executor")
+            workflow.add_node("Parser", parser_step)
+            workflow.add_edge("Executor", "Parser")
+            if entity.value > 3:
+                workflow.add_node("Replan", replan_step)
+                workflow.add_edge("Parser", "Replan")
+                workflow.add_conditional_edges("Replan", should_end,["API Selector", END],)# Next, we pass in the function that will determine which node is called next.
+            else:  # PLANNER --> API --> CALLER
+                workflow.add_conditional_edges("Parser", should_end, ["API Selector",
+                                                                      END], )  # Next, we pass in the function that will determine which node is called next.
+        else:  # PLANNER --> API
+            workflow.add_conditional_edges("API Selector", should_end, ["API Selector",
+                                                                  END], )  # Next, we pass in the function that will determine which node is called next.
+
+    app = workflow.compile()
+    # create_graph(app)
+    # exit(1)
+    config = {"recursion_limit": 20}
 
 
-async def plan_step(state: PlanExecute):
-    plan = await planner.ainvoke({"messages": [("user", state["input"])]})
-    return {"plan": plan.steps, "task": 0}
-
-async def api_selector_step(state: PlanExecute):
-    task = state["plan"][state["task"]]
-    print(f"The current step: {task}")
-    endpoint = await api_selector.ainvoke({"messages": [("user",task)]})
-    return {"api": [endpoint.endpoint], "task": state["task"] + 1, "past_steps": [(task, "The Response")]}
-
-# async def replan_step(state: PlanExecute):
-#     output = await replanner.ainvoke(state)
-#     if isinstance(output.action, ResponseModel):
-#         return {"response": output.action.response}
-#     else:
-#         return {"plan": output.action.steps}
-
-
-def should_end(state: PlanExecute):
-    if ("response" in state and state["response"]) or state["task"] >= len(state["plan"]) :
-        return END
-    else:
-        # return "agent"
-        return "API Selector"
-
-workflow = StateGraph(PlanExecute)
-workflow.add_node("Planner", plan_step)
-workflow.add_node("API Selector", api_selector_step)
-# workflow.add_node("replan", replan_step)
-workflow.add_edge(START, "Planner")
-workflow.add_edge("Planner", "API Selector")
-# workflow.add_edge("API Selector", "replan")
-workflow.add_conditional_edges("API Selector", should_end,["API Selector", END],)# Next, we pass in the function that will determine which node is called next.
-
-app = workflow.compile()
-create_graph(app)
-config = {"recursion_limit": 10}
-inputs = {"input": input(">> ")}
-async def main():
     async for event in app.astream(inputs, config=config):
         for k, v in event.items():
-            if k != "__end__":
-                print(v)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+                if k != "__end__":
+                    print(json.dumps(v, indent=4))

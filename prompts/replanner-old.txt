@@ -1,0 +1,46 @@
+For the given objective, you came up with a simple step-by-step plan. Now, after one step you got new information.
+You will get the old plan, and you should check if the answer you got fulfill the current step. If not, try to rephrase it.
+If the answer fulfills the current step, update the plan accordingly, including deleting the fulfilled step and using the known information from previous steps on the next ones.
+Update your plan accordingly. If no more steps are needed and you think the input has been fulfilled, then respond with that answer as a string. Otherwise, fill out the plan. Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan. If you think there should be new steps that have not asked for before add them to the new plan you are shaping. Do not add any superfluous steps. The plan should be as specific as possible.
+Another model will receive your plan and find the right API calls. In most case, search, filter, and sort should be completed in a single step.
+It is better not to use pronouns in plan, but to use the corresponding results obtained previously. For example, instead of "Get the most popular movie directed by this person", you should output "Get the most popular movie directed by Martin Scorsese (1032)". If you want to iteratively query something about items in a list, then the list and the elements in the list should also appear in your plan.
+Make sure that each step has all the information needed - do not skip steps. If no more steps are needed, return the answer.
+
+Use these examples for reference:
+
+Example 1:
+    input: give me some movies performed by Tony Leung.
+    original_plan: [search person with name "Tony Leung" to get his person_id., collect the list of movies performed by Tony Leung.]
+    past_steps: [(search person with name "Tony Leung" to get his person_id., {'person_id': 543, 'person_name': 'Tony Leung'})]
+    Re-Planning:
+        Plan: [collect the list of movies performed by Tony Leung whose person_id is 543]
+
+Example 2:
+    input: Who wrote the screenplay for the most famous movie directed by Martin Scorsese?
+    original_plan: [search person with name "Martin Scorsese" to get his person_id., search for the most popular movie directed by Martin Scorsese., search for the screenwriter of the most popular movie directed by Martin Scorsese]
+    past_steps: [(search person with name "Martin Scorsese" to get his person_id., {'person_id': 123, 'person_name': 'Martin Scorsese'})]
+    Re-Planning:
+        Plan: [search for the most popular movie directed by Martin Scorsese whose person_id is 123, search for the screenwriter of the most popular movie directed by Martin Scorsese]
+
+Example 3:
+    input: tell me the highest rated movie directed by Martin Scorsese
+    Plan step 1: search person with name "Martin Scorsese" to get his person_id.
+    Plan step 2: search for the highest rated movie directed by Martin Scorsese.
+    API Response 1: Martin Scorsese preson_id is 123.
+    Re-Planning 1:
+        Plan step 1: search for the highest rated movie directed by Martin Scorsese whose person_id is 123
+        API Response 2: highest rated movie directed by Martin Scorsese is GoodFellas with movie_id 769.
+    Response: highest rated movie directed by Martin Scorsese is GoodFellas
+
+
+Your objective was this:
+{input}
+
+Your original plan was this:
+{plan}
+
+You have currently done the follow steps:
+{past_steps}
+
+
+DO NOT ADD NEW STEPS THAT ARE NOT HELPFUL TO ANSWER THE INPUT!
