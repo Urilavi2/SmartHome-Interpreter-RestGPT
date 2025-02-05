@@ -1,0 +1,226 @@
+openapi: 3.0.0
+info:
+  version: '1'
+  title: Smart-Home API
+  description: no description
+servers:
+  - url: https://api.esp32-smarthome/1
+
+paths:
+  /led/{led_color}:
+    get:
+      tags:
+        - SmartHome
+      operationId: GET_led
+      summary: Get LED
+      description: Change status of the LED with the given color.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/led-result-object'
+        '404':
+          $ref: '#/components/responses/trait_standardErrors_404'
+      parameters:
+        - name: led_color
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Specify the color of the led to toggle.
+        - name: state
+          in: query
+          schema:
+            type: integer
+          description: Specify wanted state of the led. 0 - off, 1 - on.
+
+  /led/{led_color}/toggle:
+    get:
+      tags:
+        - SmartHome
+      operationId: GET_led_toggle
+      summary: Toggle LED
+      description: Toggle the LED with the given color.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/led-result-object'
+        '404':
+          $ref: '#/components/responses/trait_standardErrors_404'
+      parameters:
+        - name: led_color
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Specify the color of the led to toggle.
+        - name: repeat
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Specify how many times to toggle that led.
+        - name: repeat-period
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Specify the period of a clock cycle between turned on led to the next turn on.
+  /lcd:
+    post:
+      tags:
+        - SmartHome
+      operationId: POST_lcd
+      summary: Post onto LCD screen
+      description: Post an ASCII-string message on the LCD screen.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lcd-result-object'
+        '404':
+          $ref: '#/components/responses/trait_standardErrors_404'
+        '406':
+          $ref: '#/components/responses/trait_sessionErrors_406'
+      requestBody:
+        $ref: '#/components/requestBodies/POST_lcd-body'
+
+  /get-all:
+    get:
+      tags:
+        - SmartHome
+      operationId: GET_get-all-status
+      summary: Get status of all devices
+      description: Get status of all connected devices.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  led:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/led-result-object"
+                  lcd:
+                    $ref: "#/components/schemas/lcd-result-object"
+                  tempature:
+                    $ref: "#/components/schemas/tempature-result-object"
+                  potentionmeter:
+                    $ref: "#/components/schemas/potentionmeter-result-object"
+        '404':
+          $ref: '#/components/responses/trait_standardErrors_404'
+
+  /tempature:
+    get:
+      tags:
+        - SmartHome
+      operationId: GET_tempature
+      summary: Get tempature
+      description: Get the current temperature, in Celsius or Fahrenheit.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tempature-result-object'
+        '404':
+          $ref: '#/components/responses/trait_standardErrors_404'
+
+  /potentionmeter:
+    get:
+      tags:
+        - SmartHome
+      operationId: GET_potentionmeter
+      summary: Get potentionmeter
+      description: Get the current value of the potentiometer in Ohm.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/potentionmeter-result-object'
+        '404':
+          $ref: '#/components/responses/trait_standardErrors_404'
+
+components:  
+  responses:
+    trait_standardErrors_404:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status_message:
+                type: string
+              status_code:
+                type: integer
+    
+    trait_sessionErrors_406:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status_code:
+                type: integer
+              status_message:
+                type: string
+  
+  requestBodies:
+    POST_lcd-body:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Hello World!"
+            required:
+              - message
+  schemas:
+    led-result-object:
+      title: led-result-object
+      type: object
+      properties:
+        color:
+          type: integer
+        status:
+          type: integer
+    
+    lcd-result-object:
+      title: lcd-result-object
+      type: object
+      properties:
+        message:
+          type: string
+      
+    tempature-result-object:
+      title: tempature-result-object
+      type: object
+      properties:
+        farhenheit:
+          type: number
+        celcius:
+          type: number
+
+    potentionmeter-result-object:
+      title: potentionmeter-result-object
+      type: object
+      properties:
+        resistance:
+          type: number

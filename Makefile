@@ -18,4 +18,4 @@ full:
 
 clean:
 	@echo "Cleaning up..."
-	@del /Q /F $(CLEAN_FILES)
+	@rm -rf $(CLEAN_FILES) | true
