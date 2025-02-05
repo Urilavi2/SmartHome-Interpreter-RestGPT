@@ -5,5 +5,8 @@ test.py
 utils/__pycache__/
 .env
 __pycache__/*
+prompts/__pycache__/
 logs/*
 !logs/.gitkeep
+*.pyc
+

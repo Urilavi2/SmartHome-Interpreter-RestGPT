@@ -27,6 +27,7 @@ def _read_prompt(prompt_type: str) -> str:
 def _create_api_reference(swagger_path:str="swagger/tmdb_oas.json") -> ReducedOpenAPISpec:
     return _fetch_api_ref(swagger_path)
 
+
 def _create_endpoint_desc(api_ref:ReducedOpenAPISpec=_create_api_reference()) -> str:
     return _format_endpoints(api_ref)
 

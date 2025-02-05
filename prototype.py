@@ -19,7 +19,7 @@ import logging
 
 PROTOTYPE_level = 99
 logging.addLevelName(PROTOTYPE_level, "PROTOTYPE")
-logging.basicConfig(level=PROTOTYPE_level,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[
                         logging.FileHandler(f"logs/{datetime.now().strftime('%H%M%S%d%m%Y')}.log"),
@@ -145,10 +145,8 @@ async def prototype(*args, **kwargs):
                                                                   END], )  # Next, we pass in the function that will determine which node is called next.
 
     app = workflow.compile()
-    # create_graph(app)
-    # exit(1)
+    create_graph(app)
     config = {"recursion_limit": 20}
-
 
     async for event in app.astream(inputs, config=config):
         for k, v in event.items():
