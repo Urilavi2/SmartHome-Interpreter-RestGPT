@@ -4,7 +4,7 @@ info:
   title: Smart-Home API
   description: no description
 servers:
-  - url: https://api.esp32-smarthome/1
+  - url: http://api-esp32-smarthome.local
 
 paths:
   /led/{led_color}:
@@ -30,11 +30,11 @@ paths:
           schema:
             type: integer
           description: Specify the color of the led to toggle.
-        - name: state
-          in: query
-          schema:
-            type: integer
-          description: Specify wanted state of the led. 0 - off, 1 - on.
+        # - name: state
+        #   in: query
+        #   schema:
+        #     type: integer
+        #   description: Specify wanted state of the led. 0 - off, 1 - on.
 
   /led/{led_color}/toggle:
     get:
@@ -87,8 +87,8 @@ paths:
                 $ref: '#/components/schemas/lcd-result-object'
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
-        '406':
-          $ref: '#/components/responses/trait_sessionErrors_406'
+        '400':
+          $ref: '#/components/responses/trait_sessionErrors_400'
       requestBody:
         $ref: '#/components/requestBodies/POST_lcd-body'
 
@@ -115,8 +115,8 @@ paths:
                     $ref: "#/components/schemas/lcd-result-object"
                   tempature:
                     $ref: "#/components/schemas/tempature-result-object"
-                  potentionmeter:
-                    $ref: "#/components/schemas/potentionmeter-result-object"
+                  potentiometer:
+                    $ref: "#/components/schemas/potentiometer-result-object"
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
 
@@ -137,12 +137,12 @@ paths:
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
 
-  /potentionmeter:
+  /potentiometer:
     get:
       tags:
         - SmartHome
-      operationId: GET_potentionmeter
-      summary: Get potentionmeter
+      operationId: GET_potentiometer
+      summary: Get potentiometer
       description: Get the current value of the potentiometer in Ohm.
       responses:
         '200':
@@ -150,7 +150,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/potentionmeter-result-object'
+                $ref: '#/components/schemas/potentiometer-result-object'
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
 
@@ -163,21 +163,17 @@ components:
           schema:
             type: object
             properties:
-              status_message:
+              message:
                 type: string
-              status_code:
-                type: integer
     
-    trait_sessionErrors_406:
+    trait_sessionErrors_400:
       description: ''
       content:
         application/json:
           schema:
             type: object
             properties:
-              status_code:
-                type: integer
-              status_message:
+              message:
                 type: string
   
   requestBodies:
@@ -197,10 +193,12 @@ components:
       title: led-result-object
       type: object
       properties:
+        # id:
+        #   type: integer
         color:
           type: integer
         status:
-          type: integer
+          type: boolean
     
     lcd-result-object:
       title: lcd-result-object
@@ -218,8 +216,8 @@ components:
         celcius:
           type: number
 
-    potentionmeter-result-object:
-      title: potentionmeter-result-object
+    potentiometer-result-object:
+      title: potentiometer-result-object
       type: object
       properties:
         resistance:
