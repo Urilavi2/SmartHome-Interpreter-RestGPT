@@ -9,4 +9,8 @@ prompts/__pycache__/
 logs/*
 !logs/.gitkeep
 *.pyc
-
+esp32/*
+!esp32/final/
+!esp32/ESP32-NodeMCU-32S Pin Layout.txt
+!esp32/pinout-UPside-esp32-NodeMCU-32S.jpg
+!esp32/pinout-downside-esp32-NodeMCU-32S.jpg
