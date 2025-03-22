@@ -1,4 +1,4 @@
-ESP32-C6 Pin Layout
+ESP32-S3 Pin Layout
 ----------------------
 
 GND - LCD
