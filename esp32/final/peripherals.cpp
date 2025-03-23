@@ -130,9 +130,7 @@ void setPotentiometer(){
 
 int getPotentiometer() {
   int adc_val = analogRead(POTENTIOMETER_PIN);
-  Serial.println(adc_val);
   float tempVal = (float)adc_val / 4095.00; 
-  Serial.println(tempVal);
   return (int)(MAX_RESISTANCE * tempVal);
 
   // need to add the calculation of voltage divider
@@ -159,18 +157,4 @@ float getTemperature(bool celcius) {
     return temepratureF;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

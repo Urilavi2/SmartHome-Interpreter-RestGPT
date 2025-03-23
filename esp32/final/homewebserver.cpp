@@ -50,6 +50,14 @@ void handleLcd() {
   }
 }
 
+void getLcd() {
+  JsonDocument doc;
+  String tmp;
+  doc["message"] = readLCD();
+  serializeJson(doc, tmp);
+  server.send(200, APP_JSON, tmp);
+}
+
 void handleAll() {
   JsonDocument doc;
   String tmp;
@@ -141,11 +149,13 @@ void wifiSet() {
   server.begin();
 }
 
+
 void setEndpoints() {
   server.onNotFound(handleNotFound);
   server.on(UriRegex("^\\/led\\/([0-9]+)$"), HTTP_GET, swichLedEP);
   server.on(UriRegex("^\\/led\\/([0-9]+)/toggle$"), HTTP_GET, handleToggleLed);
   server.on("/lcd", HTTP_POST, handleLcd);
+  server.on("/lcd", HTTP_GET, getLcd);
   server.on("/get-all", HTTP_GET, handleAll);
   server.on("/temprature", HTTP_GET, handleTemp);
   server.on("/potentiometer", HTTP_GET, handlePotenionmeter);
