@@ -16,6 +16,7 @@ void wifiSet();
 void swichLedEP();
 void handleTestInt();
 void handleLcd();
+void getLcd();
 void handleAll();
 void handleTemp();
 void handlePotenionmeter();
