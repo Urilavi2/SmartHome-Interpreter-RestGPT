@@ -24,8 +24,9 @@ void createDefaultLeds();
 void setLcd();
 void setTemperature();
 Led* getLed(int color);
-int switchLed(int color);
+int switchLed(int color, String state);
 int getLedsSize();
 int getLedStatus(int color);
+int getLedIdByName(String color);
 
 #endif

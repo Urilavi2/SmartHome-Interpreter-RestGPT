@@ -1,0 +1,335 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1",
+    "title": "Smart-Home API",
+    "description": "no description"
+  },
+  "servers": [
+    {
+      "url": "http://api-esp32-smarthome.local"
+    }
+  ],
+  "paths": {
+    "/led/": {
+      "get": {
+        "tags": [
+          "SmartHome"
+        ],
+        "operationId": "GET_led",
+        "summary": "Get LED",
+        "description": "Change status of the LED with the given color.",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/led-result-object"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/trait_standardErrors_404"
+          }
+        },
+        "parameters": [
+          {
+            "name": "color",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specify the color of the led to change."
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specify wanted state of the led. OFF - off, ON - on."
+          }
+        ]
+      }
+    },
+    "/led/toggle": {
+      "get": {
+        "tags": [
+          "SmartHome"
+        ],
+        "operationId": "GET_led_toggle",
+        "summary": "Toggle LED",
+        "description": "Toggle the LED with the given color.",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/led-result-object"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/trait_standardErrors_404"
+          }
+        },
+        "parameters": [
+          {
+            "name": "color",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specify the color of the led to toggle."
+          },
+          {
+            "name": "repeat",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Specify how many times to toggle that led."
+          },
+          {
+            "name": "repeat-period",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Specify the period of a clock cycle between turned on led to the next turn on."
+          }
+        ]
+      }
+    },
+    "/lcd": {
+      "post": {
+        "tags": [
+          "SmartHome"
+        ],
+        "operationId": "POST_lcd",
+        "summary": "Post onto LCD screen",
+        "description": "Post an ASCII-string message on the LCD screen.",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lcd-result-object"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/trait_sessionErrors_400"
+          },
+          "404": {
+            "$ref": "#/components/responses/trait_standardErrors_404"
+          }
+        },
+        "requestBody": {
+          "$ref": "#/components/requestBodies/POST_lcd-body"
+        }
+      }
+    },
+    "/get-all": {
+      "get": {
+        "tags": [
+          "SmartHome"
+        ],
+        "operationId": "GET_get-all-status",
+        "summary": "Get status of all devices",
+        "description": "Get status of all connected devices.",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "led": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/led-result-object"
+                      }
+                    },
+                    "lcd": {
+                      "$ref": "#/components/schemas/lcd-result-object"
+                    },
+                    "tempature": {
+                      "$ref": "#/components/schemas/tempature-result-object"
+                    },
+                    "potentiometer": {
+                      "$ref": "#/components/schemas/potentiometer-result-object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/trait_standardErrors_404"
+          }
+        }
+      }
+    },
+    "/tempature": {
+      "get": {
+        "tags": [
+          "SmartHome"
+        ],
+        "operationId": "GET_tempature",
+        "summary": "Get tempature",
+        "description": "Get the current temperature, in Celsius or Fahrenheit.",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/tempature-result-object"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/trait_standardErrors_404"
+          }
+        }
+      }
+    },
+    "/potentiometer": {
+      "get": {
+        "tags": [
+          "SmartHome"
+        ],
+        "operationId": "GET_potentiometer",
+        "summary": "Get potentiometer",
+        "description": "Get the current value of the potentiometer in Ohm.",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/potentiometer-result-object"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/trait_standardErrors_404"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "trait_standardErrors_404": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "trait_sessionErrors_400": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "POST_lcd-body": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Hello World!"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "led-result-object": {
+        "title": "led-result-object",
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "lcd-result-object": {
+        "title": "lcd-result-object",
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "tempature-result-object": {
+        "title": "tempature-result-object",
+        "type": "object",
+        "properties": {
+          "farhenheit": {
+            "type": "number"
+          },
+          "celcius": {
+            "type": "number"
+          }
+        }
+      },
+      "potentiometer-result-object": {
+        "title": "potentiometer-result-object",
+        "type": "object",
+        "properties": {
+          "resistance": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}
