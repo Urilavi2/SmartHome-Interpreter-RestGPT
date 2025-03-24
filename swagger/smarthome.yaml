@@ -7,7 +7,7 @@ servers:
   - url: http://api-esp32-smarthome.local
 
 paths:
-  /led/{led_color}:
+  /led/:
     get:
       tags:
         - SmartHome
@@ -24,19 +24,20 @@ paths:
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
       parameters:
-        - name: led_color
-          in: path
+        - name: color
+          in: query
           required: true
           schema:
-            type: integer
-          description: Specify the color of the led to toggle.
-        # - name: state
-        #   in: query
-        #   schema:
-        #     type: integer
-        #   description: Specify wanted state of the led. 0 - off, 1 - on.
+            type: string
+          description: Specify the color of the led to change.
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Specify wanted state of the led. OFF - off, ON - on.
 
-  /led/{led_color}/toggle:
+  /led/toggle:
     get:
       tags:
         - SmartHome
@@ -53,11 +54,11 @@ paths:
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
       parameters:
-        - name: led_color
-          in: path
+        - name: color
+          in: query
           required: true
           schema:
-            type: integer
+            type: string
           description: Specify the color of the led to toggle.
         - name: repeat
           in: query
@@ -193,12 +194,10 @@ components:
       title: led-result-object
       type: object
       properties:
-        # id:
-        #   type: integer
         color:
-          type: integer
+          type: string
         status:
-          type: boolean
+          type: string
     
     lcd-result-object:
       title: lcd-result-object
