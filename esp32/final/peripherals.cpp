@@ -32,9 +32,9 @@ void setLedPins() {
 }
 
 void createDefaultLeds(){
-  leds.leds[RED] = new Led("red", RED, LED_RED_PIN);
-  leds.leds[GREEN] = new Led("green", GREEN, LED_GREEN_PIN);
-  leds.leds[BLUE] = new Led("blue", BLUE, LED_BLUE_PIN);
+  leds.leds[RED] = new Led("RED", RED, LED_RED_PIN);
+  leds.leds[GREEN] = new Led("GREEN", GREEN, LED_GREEN_PIN);
+  leds.leds[BLUE] = new Led("BLUE", BLUE, LED_BLUE_PIN);
 }
 
 Led* getLed(int color) {
@@ -57,15 +57,25 @@ int getLedsSize() {
   return leds.size;
 }
 
-int switchLed(int color) {
+int switchLed(int color, String state) {
   if (color < leds.size) {
     Led* currentLed = getLed(color);
-    currentLed->changeLedState();
+    currentLed->changeLedState(state);
     return (int)currentLed->getStatus();
   }
   else {
     return -1;
   }
+}
+
+int getLedIdByName(String name) {
+  for (int i=0; i<leds.size; i++)
+  {
+    if (name.equalsIgnoreCase(getLed(i)->getName())){
+      return getLed(i)->getColor();
+    }
+  }
+  return -1;
 }
 
 /*
@@ -157,4 +167,18 @@ float getTemperature(bool celcius) {
     return temepratureF;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

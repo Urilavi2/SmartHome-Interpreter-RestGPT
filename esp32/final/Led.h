@@ -6,17 +6,17 @@
 
 class Led{
   private:
-      char* name;
+      String name;
       int color;
       bool status;
       int pin;
   public:
-  Led(char* selfName, int selfColor, const int pinout);
+  Led(String selfName, int selfColor, const int pinout);
   Led();
   ~Led();
   int getStatus();
-  char* getName();
-  void changeLedState(); 
+  String getName();
+  void changeLedState(String state); 
   int getColor();
   
 };

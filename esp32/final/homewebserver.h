@@ -5,7 +5,6 @@
 #include <WebServer.h>
 #include <ESPmDNS.h>
 #include <ArduinoJson.h>
-#include <uri/UriRegex.h>
 
 #include "config.h"
 #include "peripherals.h"
