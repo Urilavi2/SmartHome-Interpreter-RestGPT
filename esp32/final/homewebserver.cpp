@@ -6,19 +6,43 @@ String password = SSID_PASS;
 
 
 void swichLedEP() {
-  String pathVar = server.pathArg(0);
-  String tmp;
-  JsonDocument doc;
-  int ledStatus;
-  ledStatus = switchLed(pathVar.toInt());
-  if (ledStatus == -1) {
+  if ((server.hasArg("color")) && (server.hasArg("state"))) {
+    String color, state, tmp; 
+    JsonDocument doc;
+    int ledStatus, ledId;
+
+    color = server.arg("color");
+    state = server.arg("state");
+
+    if (!(state.equalsIgnoreCase("ON")) && !(state.equalsIgnoreCase("OFF"))) {
+      handleNotFound();
+      return;
+    }
+
+    ledId = getLedIdByName(color);
+    if (ledId == -1) {
+      handleNotFound();
+      return;
+    }
+
+    ledStatus = switchLed(ledId, state);
+    if (ledStatus == -1) {
+      handleNotFound();
+      return;
+    }
+    doc["color"] = color;
+    if (ledStatus)
+      doc["status"] = "ON";
+    else
+      doc["status"] = "OFF";
+    serializeJson(doc, tmp);
+    server.send(200, APP_JSON, tmp);
+
+  }
+  else {
     handleNotFound();
     return;
   }
-  doc["color"] = pathVar;
-  doc["status"] = ledStatus;
-  serializeJson(doc, tmp);
-  server.send(200, APP_JSON, tmp);
 }
 
 void handleToggleLed() {
@@ -65,10 +89,13 @@ void handleAll() {
   JsonArray ledArr = doc["led"].to<JsonArray>();
   for (int i=0;i<getLedsSize();i++){
     JsonDocument tempDoc;
-    tempDoc["color"] = i;
+    tempDoc["color"] = getLed(i)->getName();
     status = getLedStatus(i);
     if (status != -1) {
-      tempDoc["status"] = status;
+      if (status)
+          tempDoc["status"] = "ON";
+      else
+        tempDoc["status"] = "OFF";
     }
     else {
       tempDoc["status"] = "Not Found!";
@@ -109,7 +136,7 @@ void handlePotenionmeter() {
 void handleNotFound() {
   JsonDocument doc;
   String tmp;
-  String message = "Path Not Found\n\n";
+  String message = "Path Not Found | ";
   message += "URI: ";
   message += server.uri();
   message += " | Method: ";
@@ -152,8 +179,8 @@ void wifiSet() {
 
 void setEndpoints() {
   server.onNotFound(handleNotFound);
-  server.on(UriRegex("^\\/led\\/([0-9]+)$"), HTTP_GET, swichLedEP);
-  server.on(UriRegex("^\\/led\\/([0-9]+)/toggle$"), HTTP_GET, handleToggleLed);
+  server.on("/led", HTTP_GET, swichLedEP);
+  server.on("/led/toggle", HTTP_GET, handleToggleLed);
   server.on("/lcd", HTTP_POST, handleLcd);
   server.on("/lcd", HTTP_GET, getLcd);
   server.on("/get-all", HTTP_GET, handleAll);
