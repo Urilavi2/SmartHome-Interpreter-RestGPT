@@ -3,8 +3,8 @@ ESP32-S3 Pin Layout
 
 GND - LCD
 5V - LCD
-LINE 14 = PIN22(downside) = PIN36(upside): LCD SCL,PURPLE
-LINE 14 = PIN21(downside) = PIN33(upside): LCD SDA, BLUE 
+LINE 14 = PIN22(downside) = PIN36(upside): LCD SCL
+LINE 17 = PIN21(downside) = PIN33(upside): LCD SDA 
 I2C address at 0x27
 https://lastminuteengineers.com/esp32-i2c-lcd-tutorial/
 
@@ -15,5 +15,5 @@ LINE 21 = P26: Green
 LINE 22 = P27: Blue
 
  
-LINE 22 = P35: Temperature sensor
+LINE 25 = P0: Temperature sensor
 https://www.electronicwings.com/esp32/ds18b20-sensor-interfacing-with-esp32
