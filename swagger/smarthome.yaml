@@ -7,7 +7,7 @@ servers:
   - url: http://api-esp32-smarthome.local
 
 paths:
-  /led/:
+  /led:
     get:
       tags:
         - SmartHome

@@ -12,15 +12,10 @@ ALLOW_DANGEROUS_REQUEST = True
 
 
 def http_toolkit():
-    access_token = os.environ["TMDB_ACCESS_TOKEN"]
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
     toolkit = RequestsToolkit(
-        requests_wrapper=TextRequestsWrapper(headers=headers),
+        requests_wrapper=TextRequestsWrapper(),
         allow_dangerous_requests=ALLOW_DANGEROUS_REQUEST,
     )
-
     tools = toolkit.get_tools()
     return tools
 
