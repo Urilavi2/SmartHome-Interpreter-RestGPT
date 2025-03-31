@@ -73,6 +73,21 @@ paths:
             default: 1
           description: Specify the period of a clock cycle between turned on led to the next turn on.
   /lcd:
+    get:
+      tags:
+        - SmartHome
+      operationId: GET_lcd
+      summary: Get LCD message
+      description: Get the current message on the LCD screen.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lcd-result-object'
+        '404':
+          $ref: '#/components/responses/trait_standardErrors_404'
     post:
       tags:
         - SmartHome
