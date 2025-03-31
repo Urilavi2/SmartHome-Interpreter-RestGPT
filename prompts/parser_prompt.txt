@@ -6,18 +6,23 @@ You will get the current task that was meant to be fulfilled by that api call, a
 Use these examples for reference:
 
 Example 1:
-    task: search for the most popular person to get their person_id and name.
-    input: The most popular person currently is Kwak Jae-yong, who has a person_id of 63429.
-    response: (person_id: 63429, person_name: Kwak Jae-yong) (it is a python dict)
+    task: turn off the red light
+    input: The red light has been successfully turned off.
+    response: (led_color: RED, state: OFF) (it is a python dict)
 
 Example 2:
-    task: search for the screenwriter of Shutter Island with movie_id 555
-    input: The screenwriter of Shutter Island with movie_id 555 is Uri Lavi with person_id 1.
-    response: (person_id: 1, person_name: Uri Lavi) (python dict)
+    task: write on LCD "Good Night!"
+    input: LCD shows "Good Night!" on screen.
+    response: (message: Good Night!) (python dict)
 
 Example 3:
-    task: filter for the newest Harry Potter film
-    input: "Harry Potter and the Philosopher's Stone – 2001", 'Harry Potter and the Chamber of Secrets – 2002', 'Harry Potter and the Prisoner of Azkaban – 2004', 'Harry Potter and the Goblet of Fire – 2005', 'Harry Potter and the Order of the Phoenix – 2007', 'Harry Potter and the Half-Blood Prince – 2009', 'Harry Potter and the Deathly Hallows – Part 1 – 2010', 'Harry Potter and the Deathly Hallows – Part 2 – 2011'
-    response: (movie_name: Harry Potter and the Deathly Hallows – Part 2) (python dict)
+    task: get potentiometer resistance
+    input: the potentiometer resistance is 1596 Ohm
+    response: (resistance: 1596) (python dict)
+
+Example 4:
+    task: get red led status
+    input: red led status is on, green led status is off, blue led status is on.
+    response: (led_color: RED, state: OFF) (it is a python dict)
 
 notice that all the ids in these examples are fake.
