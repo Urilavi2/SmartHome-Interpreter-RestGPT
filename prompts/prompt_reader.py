@@ -1,3 +1,4 @@
+import os
 from langchain_core.prompts import ChatPromptTemplate
 import json
 from utils.sawgger_interpreter import reduce_openapi_spec, ReducedOpenAPISpec
@@ -24,11 +25,17 @@ def _read_prompt(prompt_type: str) -> str:
     with open(f"prompts/{prompt_type}_prompt.txt", "r") as f:
         return f.read()
 
-def _create_api_reference(swagger_path:str="swagger/tmdb_oas.json") -> ReducedOpenAPISpec:
+def _create_api_reference(swagger_path:str) -> ReducedOpenAPISpec:
+    if swagger_path is None:
+        raise ValueError("SWAGGER_PATH is not set. Please set the SWAGGER_PATH environment variable.")
+    if not os.path.exists(swagger_path):
+        raise FileNotFoundError(f"Swagger file not found at {swagger_path}.")
+    if not swagger_path.endswith('.json'):
+        raise ValueError(f"Invalid Swagger file format: {swagger_path}. Expected a .json file.")
     return _fetch_api_ref(swagger_path)
 
 
-def _create_endpoint_desc(api_ref:ReducedOpenAPISpec=_create_api_reference()) -> str:
+def _create_endpoint_desc(api_ref:ReducedOpenAPISpec) -> str:
     return _format_endpoints(api_ref)
 
 def _create_planner_ChatPromptTemplate():
@@ -42,7 +49,7 @@ def _create_planner_ChatPromptTemplate():
         ]
     )
 
-def _create_api_selector_ChatPromptTemplate(endpoints=_create_endpoint_desc()):
+def _create_api_selector_ChatPromptTemplate(endpoints: str) -> ChatPromptTemplate:
     api_selector_prompt = ChatPromptTemplate.from_template(_read_prompt(prompt_type="api_selector"))
     api_selector_prompt = ChatPromptTemplate.format_prompt(api_selector_prompt, endpoints=endpoints)
     api_selector_prompt = ChatPromptTemplate.from_messages(
@@ -93,11 +100,12 @@ def _create_replanner_ChatPromptTemplate():
 
 class Prompts:
     def __init__(self):
-        self.api_ref = _create_api_reference(swagger_path="swagger/tmdb_oas.json")
+        self.api_ref = _create_api_reference(swagger_path=os.environ.get('SWAGGER_PATH', None))
         self.endpoint_desc = _create_endpoint_desc(api_ref=self.api_ref)
         self.planner = _create_planner_ChatPromptTemplate()
         self.api_selector = _create_api_selector_ChatPromptTemplate(endpoints=self.endpoint_desc)
-        self.caller = _create_caller_ChatPromptTemplate(api_docs='', task='', api_url=self.api_ref.servers[0]['url'], background='')
+        self.api_url = self.api_ref.servers[0]['url']
+        self.caller = _create_caller_ChatPromptTemplate(api_docs='', task='', api_url=self.api_url, background='')
         self.parser = _create_parser_ChatPromptTemplate()
         self.replanner = _create_replanner_ChatPromptTemplate()
 

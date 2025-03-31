@@ -12,13 +12,13 @@ Example 1:
 
 Example 2:
     task: write on LCD "Good Night!"
-    input: LCD shows "Good Night!" on screen.
+    input: LCD shows "Good Night!" message on screen.
     response: (message: Good Night!) (python dict)
 
 Example 3:
     task: get potentiometer resistance
     input: the potentiometer resistance is 1596 Ohm
-    response: (resistance: 1596) (python dict)
+    response: (resistance: 1596 Ohm) (python dict)
 
 Example 4:
     task: get red led status

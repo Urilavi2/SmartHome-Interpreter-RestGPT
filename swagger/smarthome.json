@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/led/": {
+    "/led": {
       "get": {
         "tags": [
           "SmartHome"
