@@ -42,5 +42,12 @@ task 2: Write on LCD screen "Good Night!".
 API calling 2: POST /lcd to write on LCD screen.
 API Response 2: LCD message is "Good Night!".
 
+Example 4:
+User query: turn on red led.
+Task 1: turn on red led
+API calling 1: GET /led?color=red&state=ON to turn on the red led.
+API Response 1: led of color red is in state on.
+
+
 
 notice that all the numbers in these examples are fake.

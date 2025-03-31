@@ -1,4 +1,4 @@
-CLEAN_FILES := logs graph.png
+CLEAN_FILES := logs/* graph.png
 
 planner:
 	@echo "Starting Smart Home Prototype with Planner only..."

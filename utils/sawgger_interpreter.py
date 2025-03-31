@@ -95,6 +95,16 @@ class ReducedOpenAPISpec:
     endpoints: List[Tuple[str, Union[str, None], dict]]
 
 
+    def __str__(self):
+        out = f"Reduced OpenAPI Spec:\n\nDescription:\n{self.description}\n\nServers:\n"
+        for server in self.servers:
+            out += f"{server}\n"
+        out += "\nEndpoints:\n"
+        for name, description, docs in self.endpoints:
+            out += f"{name} - {description}\n{json.dumps(docs, indent=4)}\n"
+        return out
+
+
 def reduce_openapi_spec(spec: dict, dereference: bool = True, only_required: bool = True, merge_allof: bool = False) -> ReducedOpenAPISpec:
     """Simplify/distill/minify a spec somehow.
 

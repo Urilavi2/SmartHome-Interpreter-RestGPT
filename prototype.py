@@ -2,6 +2,8 @@ import asyncio
 import json
 from copy import deepcopy
 from datetime import datetime
+import os
+from time import sleep
 from plistlib import dumps
 from utils.tools import http_toolkit
 from langchain_openai import ChatOpenAI
@@ -25,6 +27,24 @@ logging.basicConfig(level=logging.DEBUG,
                         logging.FileHandler(f"logs/{datetime.now().strftime('%H%M%S%d%m%Y')}.log"),
                     ])
 
+def testConnection(url: str, count: int) -> bool:
+    import requests
+    print(f"Connection attempt {count}...\n{'-' * 30}")
+    print(f"Tring to connect to the API on {url}...")
+    try:
+        res = requests.get(url, timeout=5)
+        if res.status_code == 200:
+            print("Connection successful")
+            return True
+    except:
+        pass
+    if count == 3:
+        print(f"Connection failed after {count} tries. Exiting...")
+        print("Please check your API URL and try again.")
+        exit(4)
+    print("Connection to the API failed. Trying again in 5 seconds...")
+    sleep(5)
+
 def proto(self, message, *args, **kwargs):
     if self.isEnabledFor(PROTOTYPE_level):
         self._log(PROTOTYPE_level, message, args, **kwargs)
@@ -47,12 +67,18 @@ async def prototype(*args, **kwargs):
     if entity.lower() not in ["planner", "api", "executor", "full"]:
         print("Entity not valid")
         exit(2)
-
     entity = Entity[entity]
-    inputs = {"input": input(">> ")}
+
     _ = load_dotenv(find_dotenv())
-    llm_model = "gpt-4o-mini"
+    llm_model = os.environ.get("LLM_MODEL", None)
     prompts = Prompts()
+
+    for count in range(1, 4):
+        if testConnection(prompts.api_url, count):
+            break
+
+    inputs = {"input": input(">> ")}
+
     caller_tools = http_toolkit()
 
     llm = ChatOpenAI(model=llm_model, temperature=0.0)
@@ -101,7 +127,6 @@ async def prototype(*args, **kwargs):
             return {"current_agent_answer": "", "past_steps": [(task, str(parse.res))], "plan": state["plan"][1:]}
         return {"current_agent_answer": "", "past_steps": [(task, str(parse.res))]}
 
-
     async def replan_step(state: PlanExecute):
         output = await replanner.ainvoke(state)
         output.more = bool(output.more)
@@ -145,10 +170,12 @@ async def prototype(*args, **kwargs):
                                                                   END], )  # Next, we pass in the function that will determine which node is called next.
 
     app = workflow.compile()
-    create_graph(app)
+    # create_graph(app)
     config = {"recursion_limit": 20}
 
     async for event in app.astream(inputs, config=config):
         for k, v in event.items():
                 if k != "__end__":
                     print(json.dumps(v, indent=4))
+
+
