@@ -18,45 +18,29 @@ Use these examples for reference:
 
 Example 1:
 
-User query: give me the latest movie directed by Wong Kar-Wai.
-Task 1: get Wong Kar-Wai's person_id.
-API calling 1: GET /search/person to get Wong Kar-Wai person_id.
-API Response 1: Wong Kar-Wai person_id is 12453.
-Task 2: get the latest movie directed by Wong Kar-Wai with preson_id 12453.
-API calling 2: GET /person/12453/movie_credits to get the latest movie directed by Wong Kar-Wai (person_id 12453)
-API Response 2: The latest movie directed by Wong Kar-Wai is The Grandmaster (movie_id 44865)
+User query: What is written on the LCD screen.
+Task 1: Get the LCD message.
+API calling 1: GET /lcd to get the current message on the LCD screen
+API Response 1: LCD message is "Hello World!".
 
 
 Example 2:
 
-User query: search for movies produced by DreamWorks Animation
-Task 1: get DreamWorks Animation company_id.
-API calling 1: GET /search/company to get the id of DreamWorks Animation
-API Response 1: DreamWorks Animation company_id is 5.
-Task 2: Search for the movies produced by DreamWorks Animation with company_id 5.
-API calling 2: GET /discover/movie to get the movies produced by DreamWorks Animation (company_id is 5)
-API Response 2: Puss in Boots: The Last Wish (id 315162), Shrek (id 808), The Bad Guys (id 629542), ...
+User query: what is the resistance of the potentiometer?
+Task 1: get current value of the potentiometer in Ohm.
+API calling 1: GET /potentiometer to get current value of the potentiometer in Ohm.
+API Response 1: The resistance of the potentiometer is 1478 Ohm.
 
 
 Example 3:
 
-User query: search for the director of Happy Together
-Task 1: get Happy Together movie_id.
-API calling 1: GET /search/movie to get Happy Together movie_id.
-API Response 1: Happy Together movie_id is 98.
-task 2: get the director for the movie Happy Together with movie_id 98.
-API calling 2: GET /movie/98/credits to get the director for the movie Happy Together.
-API Response 2: The director of Happy Together is Wong Kar-Wai (12453)
+User query: Write "Hello World" on LCD screen if resistance is higher than 3000, else Write "Good Night!".
+Task 1: Get potentiometer resistance.
+API calling 1: GET /potentiometer to get current value of the potentiometer in Ohm.
+API Response 1: The resistance of the potentiometer is 1478 Ohm.
+task 2: Write on LCD screen "Good Night!".
+API calling 2: POST /lcd to write on LCD screen.
+API Response 2: LCD message is "Good Night!".
 
-
-Example 4:
-
-User query: search for the highest rated movie directed by Wong Kar-Wai
-Task 1: search for Wong Kar-Wai's person_id.
-API calling 1: GET /search/person to search for Wong Kar-Wai
-API Response 1: Wong Kar-Wai person_id is 12453.
-Task 2: Search for the highest rated movie directed by Wong Kar-Wai with person_id 12453.
-API calling 2: GET /person/12453/movie_credits to get the highest rated movie directed by Wong Kar-Wai (person_id 12453)
-API Response 2: The highest rated movie directed by Wong Kar-Wai is In the Mood for Love (id 843).
 
 notice that all the numbers in these examples are fake.
