@@ -192,4 +192,3 @@ void setEndpoints() {
 void serverHandleClient() {
   server.handleClient();
 }
-

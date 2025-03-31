@@ -10,7 +10,7 @@
 #define GREEN 1
 #define BLUE 2
 
-#define TEMPERATURE_PIN 35
+#define TEMPERATURE_PIN 0
 #define POTENTIOMETER_PIN 34
 
 #define LCD_COLS 16
@@ -19,8 +19,8 @@
 #define SCROLL_DELAY 700
 
 
-#define SSID_NAME "SHEVA"
-#define SSID_PASS "0543060936"
+#define SSID_NAME "uri lavi"
+#define SSID_PASS "abcdefgh"
 
 #define APP_JSON "application/json"
 #define KEY_MSG "message"

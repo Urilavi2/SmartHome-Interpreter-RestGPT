@@ -153,7 +153,7 @@ int getPotentiometer() {
 */
 
 void setTemperature(){
-
+  sensors.begin();
 }
 
 float getTemperature(bool celcius) {
@@ -167,18 +167,3 @@ float getTemperature(bool celcius) {
     return temepratureF;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
