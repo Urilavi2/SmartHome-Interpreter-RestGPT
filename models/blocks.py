@@ -45,8 +45,8 @@ class ResponseModel(BaseModel):
 class ActModel(BaseModel):
     """Action to perform."""
     more: bool = Field(
-        description="Action to perform. If you want to respond to user, return False. "
-        "If you need to further use tools to get the answer, Return True."
+        description=("If the final answer is ready to present to the user, return more: false."
+                    "If more steps are needed to reach the final answer, return more: true.")
     )
     response: Optional[str] = Field(
         default=None,

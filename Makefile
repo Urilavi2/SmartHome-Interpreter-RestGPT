@@ -16,6 +16,10 @@ full:
 	@echo "Starting Smart Home Full Prototype Application..."
 	@py ./main.py entity=full
 
+run:
+	@echo "Starting Smart Home Framework..."
+	@py ./main.py entity=framework
+
 clean:
 	@echo "Cleaning up..."
 	@rm -rf $(CLEAN_FILES) | true
