@@ -26,7 +26,7 @@ def split_args():
             key, value = arg.split("=", 1)
             kwargs[key] = value
         else:  # Positional argument
-            args.append(arg)
+            args.append(arg.strip("-"))
     return args, kwargs
 
 def testConnection(url: str, count: int) -> bool:

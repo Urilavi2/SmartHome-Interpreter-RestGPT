@@ -6,7 +6,7 @@ If there is a need for sorting, ignore it and return all options in a list with 
 You must always a JSON with the information in natural language, another module will handle your output.
 
 You can use http request method, i.e., GET, POST, DELETE, PATCH, PUT, and generate the corresponding parameters according to the given 'http_request' input and the plan.
-You will get the wanted operation and inputs to do from another module.
+You will get the wanted operation and inputs to do from another module. If http_request is empty, try to collect the wanted information from previous answers given in the past_steps list. If you can not answer to the current task, return "Did not find an API to call." as your response.
 
 Your input will include the following attributes:
 
