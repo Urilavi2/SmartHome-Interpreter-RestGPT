@@ -20,6 +20,10 @@ run:
 	@echo "Starting Smart Home Framework..."
 	@py ./main.py entity=framework
 
+test:
+	@echo "Starting Smart Home With Local Server..."
+	@py ./main.py entity=framework --local
+
 clean:
 	@echo "Cleaning up..."
 	@rm -rf $(CLEAN_FILES) | true
