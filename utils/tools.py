@@ -1,12 +1,9 @@
-import json
-import os
+from time import sleep
 import sys
-from tabnanny import verbose
-
 from langchain_community.agent_toolkits.openapi.toolkit import RequestsToolkit
 from langchain_community.utilities.requests import TextRequestsWrapper
-from langchain_core.tools import tool
-import requests
+from PIL import Image
+from langgraph.graph import StateGraph
 
 ALLOW_DANGEROUS_REQUEST = True
 
@@ -31,3 +28,28 @@ def split_args():
         else:  # Positional argument
             args.append(arg)
     return args, kwargs
+
+def testConnection(url: str, count: int) -> bool:
+    import requests
+    print(f"Connection attempt {count}...\n{'-' * 30}")
+    url_endpoint = url + "/"
+    print(f"Tring to connect to the API on {url_endpoint}...")
+    try:
+        res = requests.get(url_endpoint, timeout=5)
+        if res.status_code == 200:
+            print("Connection successful")
+            return True
+    except:
+        pass
+    if count == 3:
+        print(f"Connection failed after {count} tries. Exiting...")
+        print("Please check your API URL and try again.")
+        exit(4)
+    print("Connection to the API failed. Trying again in 5 seconds...")
+    sleep(5)
+
+def create_graph(g: StateGraph.compile):
+    a = g.get_graph(xray=True).draw_mermaid_png()
+    with open("graph.png", "wb") as f:
+        f.write(a)
+    Image.open("graph.png").show()

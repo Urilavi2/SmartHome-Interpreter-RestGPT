@@ -190,7 +190,7 @@
                       "$ref": "#/components/schemas/lcd-result-object"
                     },
                     "tempature": {
-                      "$ref": "#/components/schemas/tempature-result-object"
+                      "$ref": "#/components/schemas/temprature-result-object"
                     },
                     "potentiometer": {
                       "$ref": "#/components/schemas/potentiometer-result-object"
@@ -206,21 +206,21 @@
         }
       }
     },
-    "/tempature": {
+    "/temprature": {
       "get": {
         "tags": [
           "SmartHome"
         ],
-        "operationId": "GET_tempature",
-        "summary": "Get tempature",
-        "description": "Get the current temperature, in Celsius or Fahrenheit.",
+        "operationId": "GET_temprature",
+        "summary": "Get temprature",
+        "description": "Get the current temprature, in Celsius or Fahrenheit.",
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/tempature-result-object"
+                  "$ref": "#/components/schemas/temprature-result-object"
                 }
               }
             }
@@ -332,8 +332,8 @@
           }
         }
       },
-      "tempature-result-object": {
-        "title": "tempature-result-object",
+      "temprature-result-object": {
+        "title": "temprature-result-object",
         "type": "object",
         "properties": {
           "farhenheit": {

@@ -5,13 +5,13 @@ from datetime import datetime
 import os
 from time import sleep
 from plistlib import dumps
-from utils.tools import http_toolkit
+from utils.tools import http_toolkit, testConnection
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv, find_dotenv
 from logging import getLogger, Logger
 from langchain_core.prompts import ChatPromptTemplate
-from prompts.prompt_reader import Prompts
+from prompts.prompts import Prompts
 from models.blocks import *
 from utils.sawgger_interpreter import *
 from langgraph.graph import END, StateGraph, START
@@ -27,23 +27,7 @@ logging.basicConfig(level=logging.DEBUG,
                         logging.FileHandler(f"logs/{datetime.now().strftime('%H%M%S%d%m%Y')}.log"),
                     ])
 
-def testConnection(url: str, count: int) -> bool:
-    import requests
-    print(f"Connection attempt {count}...\n{'-' * 30}")
-    print(f"Tring to connect to the API on {url}...")
-    try:
-        res = requests.get(url, timeout=5)
-        if res.status_code == 200:
-            print("Connection successful")
-            return True
-    except:
-        pass
-    if count == 3:
-        print(f"Connection failed after {count} tries. Exiting...")
-        print("Please check your API URL and try again.")
-        exit(4)
-    print("Connection to the API failed. Trying again in 5 seconds...")
-    sleep(5)
+
 
 def proto(self, message, *args, **kwargs):
     if self.isEnabledFor(PROTOTYPE_level):
@@ -74,6 +58,7 @@ async def prototype(*args, **kwargs):
     prompts = Prompts()
 
     for count in range(1, 4):
+        break
         if testConnection(prompts.api_url, count):
             break
 
@@ -170,7 +155,7 @@ async def prototype(*args, **kwargs):
                                                                   END], )  # Next, we pass in the function that will determine which node is called next.
 
     app = workflow.compile()
-    # create_graph(app)
+    create_graph(app)
     config = {"recursion_limit": 20}
 
     async for event in app.astream(inputs, config=config):
