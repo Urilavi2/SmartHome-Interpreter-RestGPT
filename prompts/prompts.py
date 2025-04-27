@@ -95,7 +95,7 @@ class Prompts:
         api_spec = reduce_openapi_spec(raw_tmdb_api_spec, only_required=False)
         return api_spec
 
-    def __change_caller_prompt(self, api_docs=None, task=None, api_url=None, background=None):
+    def change_caller_prompt(self, api_docs=None, task=None, api_url=None, background=None):
         if api_url is None:
             api_url = self.api_ref.servers[0]['url']
         if task is None:

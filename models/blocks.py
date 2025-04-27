@@ -22,9 +22,6 @@ class EndpointModel(BaseModel):
     endpoint: Union[Dict[str, Any], Dict[str, str]] = Field(
         description="An endpoint to send http request to. Should have keys like: http_method, URL, path_variables, queries, headers, body, etc."
     )
-    old_result: str = Field(
-        description="The old result calculated before. return None if not used."
-    )
 
 class PlanExecute(TypedDict):
     input: str

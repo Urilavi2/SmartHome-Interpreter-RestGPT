@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 async def run(*args, **kwargs):
     _ = load_dotenv(find_dotenv())
     prompts = Prompts()
-    if "local" not in args:
-        for count in range(1, 4):
-            if testConnection(prompts.api_url, count):
-                break
+
+    for count in range(1, 4):
+        if testConnection(prompts.api_url, count):
+            break
     while True:
         inputs = {"input": input(">> ")}
         if inputs["input"] == "exit":

@@ -1,3 +1,4 @@
+include .env
 CLEAN_FILES := logs/* graph.png
 
 planner:
@@ -20,10 +21,26 @@ run:
 	@echo "Starting Smart Home Framework..."
 	@py ./main.py entity=framework
 
-test:
+local: run-server
 	@echo "Starting Smart Home With Local Server..."
-	@py ./main.py entity=framework --local
+	@py ./main.py entity=framework
 
 clean:
 	@echo "Cleaning up..."
 	@rm -rf $(CLEAN_FILES) | true
+
+enable-local:
+	@echo "Turnning ON 'api-esp32-smarthome.local' in hosts file..."
+	@toggle_hosts.bat on 
+	@echo "Done!"
+
+disable-local:
+	@set -e
+	@echo "Turnning OFF 'api-esp32-smarthome.local' in hosts file..."
+	@toggle_hosts.bat off
+	@echo "Done!"
+
+run-server: enable-local
+	@echo "Starting Local Server..."
+	@powershell.exe -Command "Start-Process cmd -ArgumentList '/k', 'python \"$(CURDIR)/server_mock/server.py\"'"
+	@echo "Server started!"
