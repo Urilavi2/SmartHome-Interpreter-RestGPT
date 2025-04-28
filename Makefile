@@ -17,7 +17,7 @@ full:
 	@echo "Starting Smart Home Full Prototype Application..."
 	@py ./main.py entity=full
 
-run:
+run: disable-local
 	@echo "Starting Smart Home Framework..."
 	@py ./main.py entity=framework
 
