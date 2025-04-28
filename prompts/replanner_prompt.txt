@@ -16,6 +16,7 @@ If any comparation is needed as the user requested do it here. (e.g. do A if the
 If you have the answer to the input query, return it. If there a more steps to do, do not tell me to do them, fill out the plan and continue the process.
 Do not return previously done steps as part of the plan. Do not add more steps than needed to get the answer.
 Notice that both id and name usually come together and you will have them both in the past_steps. If you have an answer or information, there is no need to confirm it.
+If the field "wrong_answer" is True, that means that the last step was not achieved and there is a need to do it again, a bit differntly. In this case, try to rephrase this step.
 
 Use these examples for reference:
 
@@ -23,18 +24,18 @@ Example 1:
     objective: turn on red led
     original_plan: [turn on red led]
     past_steps: [("turn on red led", "red led has successfully turned on")]
+    wrong_answer: False
     response: (
-        more: False
-        response: red led has successfully turned on
+        steps: [no more things to do. user input has been fulfilled]
     )
 
 
 Example 2:
-    objective: if the resistance is above 5000 turn on the red led, else turn on the blue led
+    objective: if the resistance is above 6000 turn on the red led, else turn on the blue led
     original_plan: ["get the resistance", "Turn on the red led if the resistance is greater than 6000, else turn on the blue led."]
     past_steps: [("get the resistance", "the resistance is 8000 Ohm")]
+    wrong_answer: False
     response: (
-        more: True
         steps: [turn on red led]  // explanation: 8000 is greater than 6000, therefore turn on the red led
     )
 
@@ -42,25 +43,25 @@ Example 3:
     objective: if the temprature is above 29 celsius degrees, turn on the red led, else turn on the blue led.
     original_plan: ["get the temprature", "turn on red led if the temprature is above 29 celsius degrees, else turn on the blue led"]
     past_steps: [("get the temprature", ("farhenheit: 81.22 , celsius: 27.1"))]
+    wrong_answer: False
     response: (
-        more: True
         steps: [turn on blue led]  // explanation: in past steps we got 27.1 celsius degrees, therefore we need to turn on only the blue led according to user request and that will be the final step
     )
 
 Example 4:
     objective: if the resistance is above 5000 turn on the red led, else turn on the blue led
     original_plan: ["get the resistance", "Turn on the red led if the resistance is greater than 6000, else turn on the blue led."]
-    past_steps: [("get the resistance", "the resistance is 8000 Ohm"), ("turn on red led", "red led has been turned on successfully")]
+    past_steps: [("get the resistance", "the resistance is 8000 Ohm"), ("turn on red led if resistance is above 6000 Ohm", (resistance: 8000 Ohm))]
+    wrong_answer: True  
     response: (
-        more: False
-        response: The resistance is above 5000 Ohm, therefore red led has been turned on. // explanation: we fullfill the user request, therefore no futher steps are required.
+        steps: [turn on the red led] // explanation: you already have the answer for if the resistance is greater than 6000 Ohm, so there is no need to check for it again, just turn the red light
     )
 
 Example 5:
     objective: if the temprature is above 29 celsius degrees, turn on the red led, else turn on the blue led.
     original_plan: ["get the temprature", "turn on red led if the temprature is above 29 celsius degrees, else turn on the blue led"]
     past_steps: [("get the temprature", ("farhenheit: 81.22 , celsius: 27.1")), ("turn on blue led", "blue led has been turned successfully")]
+    wrong_answer: False
     response: (
-        more: False
         response: The temprature is lower than 29 celsius degrees, therefore blue led has been turned on. // explanation: we fullfill the user request, therefore no futher steps are required.
     )

@@ -30,13 +30,22 @@ class PlanExecute(TypedDict):
     past_steps: Annotated[List[Tuple], operator.add]
     api: Annotated[List[dict], operator.add]
     task: int
-    response: str
+    final: str
     current_agent_answer: str
+    wrong_answer: bool
 
-
-class ResponseModel(BaseModel):
-    """Final answer that fulfills user request"""
-    response: str
+   
+class DecisionModel(BaseModel):
+    """Decision to make"""
+    decision: bool = Field(
+        description="Decision to make, True if no more steps are need or False if got the final answer."
+    )
+    wrong_answer: bool = Field(
+        description="True if the answer is wrong, False if the answer is correct according to currect task and answer."
+    )
+    final: Optional[str] = Field(
+        description="Final answer to be presented to the user. Apply only if decision is True.",
+    )
 
 
 class ActModel(BaseModel):

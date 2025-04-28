@@ -21,7 +21,7 @@ run:
 	@echo "Starting Smart Home Framework..."
 	@py ./main.py entity=framework
 
-local: run-server
+local: check-connection
 	@echo "Starting Smart Home With Local Server..."
 	@py ./main.py entity=framework
 
@@ -44,3 +44,10 @@ run-server: enable-local
 	@echo "Starting Local Server..."
 	@powershell.exe -Command "Start-Process cmd -ArgumentList '/k', 'python \"$(CURDIR)/server_mock/server.py\"'"
 	@echo "Server started!"
+
+graph:
+	@echo "Generating graph..."
+	@py ./main.py entity=framework graph
+
+check-connection:
+	@curl -s -o /dev/null -w "%{http_code}" http://api-esp32-smarthome.local:80 | grep -q 200 && echo "Server is already running!" || $(MAKE) run-server
