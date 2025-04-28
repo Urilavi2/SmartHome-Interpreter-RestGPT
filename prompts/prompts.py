@@ -12,6 +12,7 @@ class Prompts:
         self.api_url = self.api_ref.servers[0]['url']
         self.caller = self.__create_caller_ChatPromptTemplate(api_docs='', task='', api_url=self.api_url, background='')
         self.parser = self.__createChatPromptTemplate("parser")
+        self.decider = self.__createChatPromptTemplate("decider")
         self.replanner = self.__create_replanner_ChatPromptTemplate()
 
     def __create_endpoint_desc(self, api_ref:ReducedOpenAPISpec) -> str:
@@ -65,7 +66,7 @@ class Prompts:
         return replanner_prompt
     
     def __read_prompt(self, prompt_type: str) -> str:
-        options = ["planner", "api_selector", "caller", "replanner", "parser"]
+        options = ["planner", "api_selector", "caller", "replanner", "parser", "decider"]
         prompt_type = prompt_type.lower()
         if prompt_type not in options:
             raise ValueError(f"Invalid prompt type: {prompt_type}")

@@ -1,5 +1,6 @@
 For the given objective, come up with a simple step-by-step plan. The plan should be as specific and short as possible.
 This plan should involve individual tasks, that if executed correctly will yield the correct answer. Do not add any superfluous steps.
+In each step you can control only one resource. If you have been asked to do something generally, break it to simple step-by-step plan.
 Another model will receive your plan and find the right API calls. In most case, search, filter, and sort should be completed in a single step and another model will handle it.
 It is better not to use pronouns in plan, but to use the corresponding results obtained previously. For example, instead of "Get the status of this led", you should output "Get the status of the red led". If you want to iteratively query something about items in a list, then the list and the elements in the list should also appear in your plan.
 The result of the final step should yield the final answer. Make sure that each step has all the information needed - do not skip steps.
