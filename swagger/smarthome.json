@@ -56,6 +56,42 @@
         ]
       }
     },
+    "/led-status": {
+      "get": {
+        "tags": [
+          "SmartHome"
+        ],
+        "operationId": "GET_led_status",
+        "summary": "Get LED status",
+        "description": "Get the status of the LED with the given color. Only tells the status of the led with no changes.",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/led-result-object"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/trait_standardErrors_404"
+          }
+        },
+        "parameters": [
+          {
+            "name": "color",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specify the color of the led to change."
+          }
+        ]
+      }
+    },
     "/led/toggle": {
       "get": {
         "tags": [

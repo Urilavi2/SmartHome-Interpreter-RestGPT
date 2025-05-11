@@ -44,6 +44,19 @@ def led():
         'message': 'Invalid color or status parameter.'
     }), 404
 
+@app.route("/led-status", methods=["GET"])
+def ledStatus():
+    """returns the status of the led with a given color"""
+    # Get the query parameters from the request
+    color = request.args.get("color")
+    if not color:
+        return jsonify({
+            'message': 'Missing color parameter.'
+        }), 404
+    for led_idx in range(0, len(leds)):
+        if leds[led_idx].color == color:
+            return jsonify(leds[led_idx].model_dump()), 200
+
 
 @app.route("/lcd", methods=["GET", "POST"])
 def lcd_screen():
@@ -79,6 +92,9 @@ def get_potentiometer():
 @app.route("/get-all", methods=["GET"])
 def get_all():
     """Get all values."""
+    potentiometer.resistance = random.randint(0, 10000)
+    temperature.celsius = random.uniform(10, 40)
+    temperature.fahrenheit = random.uniform(50, 104)
     return jsonify({
         "led": [led.model_dump() for led in leds],
         "temperature": temperature.model_dump(),

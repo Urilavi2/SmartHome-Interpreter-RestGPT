@@ -45,6 +45,35 @@ void swichLedEP() {
   }
 }
 
+void ledStatus() {
+  if  (!server.hasArg("color")){
+    handleNotFound();
+    return;
+  }
+  String color, tmp; 
+  JsonDocument doc;
+  int status, ledId;
+
+  color = server.arg("color");
+  ledId = getLedIdByName(color);
+  if (ledId == -1) {
+    handleNotFound();
+    return;
+  }
+  status = getLedStatus(ledId);
+  
+  doc["color"] = color;
+  if (status){
+    doc["status"] = "ON";
+  }
+  else {
+    doc["status"] = "OFF";
+  }
+
+  serializeJson(doc, tmp);
+  server.send(200, APP_JSON, tmp);
+}
+
 void handleToggleLed() {
   String pathVar = server.pathArg(0);
   String tmp;
@@ -180,6 +209,7 @@ void wifiSet() {
 void setEndpoints() {
   server.onNotFound(handleNotFound);
   server.on("/led", HTTP_GET, swichLedEP);
+  server.on("/led-status", HTTP_GET, ledStatus);
   server.on("/led/toggle", HTTP_GET, handleToggleLed);
   server.on("/lcd", HTTP_POST, handleLcd);
   server.on("/lcd", HTTP_GET, getLcd);
