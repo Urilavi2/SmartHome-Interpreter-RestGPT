@@ -187,6 +187,13 @@ class Workflow:
         else:   
             return "Replan"
         
+    async def reflection(self, inputs: dict, error: Exception, step: str ):
+        """
+        Every step (caller parser decider) will start with dict variable named reflection. for the first try block it will store the regular input.
+        for the second try block it will store:
+        a string saying "by the previous call with the input {inputs} the error {error} was raised. Try to fix your call and return the result."
+        """
+        pass
         
     def create_graph(self, g: StateGraph.compile):
         a = g.get_graph(xray=True).draw_mermaid_png()
