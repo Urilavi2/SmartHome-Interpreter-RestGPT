@@ -16,6 +16,7 @@ void swichLedEP();
 void handleTestInt();
 void handleLcd();
 void getLcd();
+void ledStatus();
 void handleAll();
 void handleTemp();
 void handlePotenionmeter();
