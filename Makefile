@@ -23,7 +23,7 @@ run: disable-local
 
 local: check-connection
 	@echo "Starting Smart Home With Local Server..."
-	@py ./main.py entity=framework
+	@py ./main.py entity=framework 
 
 clean:
 	@echo "Cleaning up..."
@@ -51,3 +51,8 @@ graph:
 
 check-connection:
 	@curl -s -o /dev/null -w "%{http_code}" http://api-esp32-smarthome.local:80 | grep -q 200 && echo "Server is already running!" || $(MAKE) run-server
+
+
+keyboard: check-connection
+	@echo "Starting Smart Home With Local Server..."
+	@py ./main.py entity=framework keyboard
