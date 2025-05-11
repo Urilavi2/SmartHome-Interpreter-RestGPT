@@ -6,6 +6,7 @@ from utils.tools import testConnection, create_graph
 from dotenv import load_dotenv, find_dotenv
 from prompts.prompts import Prompts
 from models.workflow import Workflow
+from utils.stt import SpeechToText
 
 RUNTIME_level = 99
 logging.addLevelName(RUNTIME_level, "RUNTIME")
@@ -27,25 +28,43 @@ logger = logging.getLogger(__name__)
 async def run(*args, **kwargs):
     _ = load_dotenv(find_dotenv())
     prompts = Prompts()
+    stt = SpeechToText()
     workflow = Workflow(prompts=prompts)
-    graph = args[0] if len(args) > 0 and args[0]=="graph" else False
-    if graph:
+    keyboard = False
+
+    if "keyboard" in args:
+        keyboard = True
+
+    if "graph" in args:
         create_graph(workflow.app)
         print("Graph created successfully.")
         exit(0)
+
     for count in range(1, 4):
         if testConnection(prompts.api_url, count):
             break
+      
+
     while True:
         default_prompt = "turn on red light"
-        inputs = {"input": input(f"(press enter for default message: '{default_prompt}') >> ")}
+        if not keyboard:
+            try:
+                print(f"say 'default' to use default message '{default_prompt}'")
+                inputs = {"input": stt.listen()}
+            except Exception as e:
+                 print(e)
+                 continue
+        else:
+            inputs = {"input": input(f"(press enter for default message: '{default_prompt}') >> ")}
+        
         if inputs["input"] == "exit":
             print("Exiting...")
             break
-        elif inputs["input"] == "":
+        elif inputs["input"] == "default" or inputs["input"] == "":
             inputs["input"] = default_prompt
 
-        config = {"recursion_limit": 20}
+
+        config = {"recursion_limit": int(os.environ.get("RECURSION_LIMIT", "20"))}
 
         async for event in workflow.app.astream(inputs, config=config):
             for k, v in event.items():
