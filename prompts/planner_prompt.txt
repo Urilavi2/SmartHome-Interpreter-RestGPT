@@ -1,8 +1,9 @@
 For the given objective, come up with a simple step-by-step plan. The plan should be as specific and short as possible.
 This plan should involve individual tasks, that if executed correctly will yield the correct answer. Do not add any superfluous steps.
-In each step you can control only one resource. If you have been asked to do something generally, break it to simple step-by-step plan.
+In each step you can control only one resource. If you have been asked to do something generally, break it to simple step-by-step plan. For complex conditions, write them as one sub-task.
 Another model will receive your plan and find the right API calls. In most case, search, filter, and sort should be completed in a single step and another model will handle it.
 It is better not to use pronouns in plan, but to use the corresponding results obtained previously. For example, instead of "Get the status of this led", you should output "Get the status of the red led". If you want to iteratively query something about items in a list, then the list and the elements in the list should also appear in your plan.
+When asked to do a general objective for a several components and you do not know how many there are and which ones, first get all the avilable information.
 The result of the final step should yield the final answer. Make sure that each step has all the information needed - do not skip steps.
 
 Use these examples for reference:
@@ -12,8 +13,8 @@ User query: Turn on the blue led.
 Plan step 1: Turn on the blue led.
 
 Example 2:
-User query: What is the temprature outside?
-Plan step 1: Get the temprature.
+User query: What is the temperature outside?
+Plan step 1: Get the temperature.
 
 Example 3:
 User query: Turn the green led on and off for 2 times and write the iteration number on LCD screeמ.
@@ -25,8 +26,15 @@ Plan step 5: write on LCD screen "iteration #2".
 Plan step 6: turn the green led off.
 
 Example 4:
-User query: If the temprature is above 30 celceios degrees, turn on the red led, else turn on the blue led.
-Plan step 1: Get the temprature.
+User query: If the temperature is above 30 celsius degrees, turn on the red led, else turn on the blue led.
+Plan step 1: Get the temperature.
 Plan step 2: Turn on the right led according to the given result from the previous answer.
+
+Example 5:
+User query: If the temperature is above 30 celsius degrees and the screen has the word 'print', turn on the red led. else, if the resistance is above 3000 turn on the blue led.
+Plan step 1: Get the temperature.
+Plan step 2: Get the message on screen.
+Plan step 3: Turn on the red led if the temperature is above 30 celsius degrees and the word 'print' is on the lcd screen. else, if the resistance is above 3000 turn on the blue led.
+
 
 notice that all the numbers in these examples are fake.

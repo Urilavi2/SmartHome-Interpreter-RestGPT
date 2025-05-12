@@ -12,7 +12,7 @@ from models.blocks import PlanModel, ParserModel, EndpointModel, ActModel, PlanE
 logger = logging.getLogger(__name__)
 
 class Workflow:
-    def __init__(self, prompts: Prompts):
+    def __init__(self, prompts: Prompts, subject=""):
         self.prompts = prompts
         self.llm_model = os.environ.get("LLM_MODEL", None)
         self.llm = ChatOpenAI(model=self.llm_model, temperature=0.0)
@@ -27,24 +27,29 @@ class Workflow:
         self.replanner = prompts.replanner | self.llm.with_structured_output(PlanModel)
         
         self.state = StateGraph(PlanExecute)
-        self.configure_workflow()    
+        self.configure_workflow(subject)    
         self.app = self.state.compile()
 
 
-    def configure_workflow(self):
-        self.state.add_node("Planner", self.plan_step)
-        self.state.add_edge(START, "Planner")
-        self.state.add_node("API Selector", self.api_selector_step)
-        self.state.add_edge("Planner", "API Selector")
-        self.state.add_node("Executor", self.caller_step)
-        self.state.add_edge("API Selector", "Executor")
-        self.state.add_node("Parser", self.parser_step)
-        self.state.add_edge("Executor", "Parser")
-        self.state.add_node("Replan", self.replan_step)
-        self.state.add_edge("Parser", "Decider")
-        self.state.add_node("Decider", self.decider_step)
-        self.state.add_conditional_edges("Decider", self.should_end, ["Replan", END])
-        self.state.add_edge("Replan", "API Selector")
+    def configure_workflow(self, subject):
+        if not subject:
+            self.state.add_node("Planner", self.plan_step)
+            self.state.add_edge(START, "Planner")
+            self.state.add_node("API Selector", self.api_selector_step)
+            self.state.add_edge("Planner", "API Selector")
+            self.state.add_node("Executor", self.caller_step)
+            self.state.add_edge("API Selector", "Executor")
+            self.state.add_node("Parser", self.parser_step)
+            self.state.add_edge("Executor", "Parser")
+            self.state.add_node("Replan", self.replan_step)
+            self.state.add_edge("Parser", "Decider")
+            self.state.add_node("Decider", self.decider_step)
+            self.state.add_conditional_edges("Decider", self.should_end, ["Replan", END])
+            self.state.add_edge("Replan", "API Selector")
+        elif subject.lower() == "planner":
+            self.state.add_node("Planner", self.plan_step)
+            self.state.add_edge(START, "Planner")
+            self.state.add_edge("Planner", END)
 
     async def plan_step(self, state: PlanExecute):
         try:

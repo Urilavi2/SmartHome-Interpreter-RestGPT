@@ -137,7 +137,7 @@ void handleAll() {
 
   JsonObject tempature = doc["tempature"].to<JsonObject>();
   tempature["farhenheit"] = getTemperature(false);
-  tempature["celcius"] = getTemperature(true);
+  tempature["celsius"] = getTemperature(true);
 
   JsonObject potentiometer = doc["potentiometer"].to<JsonObject>();
   potentiometer["resistance"] = getPotentiometer();
@@ -149,7 +149,7 @@ void handleTemp() {
   JsonDocument doc;
   String tmp;
   doc["farhenheit"] = getTemperature(false);
-  doc["celcius"] = getTemperature(true);
+  doc["celsius"] = getTemperature(true);
   serializeJson(doc, tmp);
   server.send(200, APP_JSON, tmp);
 }
@@ -214,7 +214,7 @@ void setEndpoints() {
   server.on("/lcd", HTTP_POST, handleLcd);
   server.on("/lcd", HTTP_GET, getLcd);
   server.on("/get-all", HTTP_GET, handleAll);
-  server.on("/temprature", HTTP_GET, handleTemp);
+  server.on("/temperature", HTTP_GET, handleTemp);
   server.on("/potentiometer", HTTP_GET, handlePotenionmeter);
   server.on("/", HTTP_GET, handleRoot);
 }

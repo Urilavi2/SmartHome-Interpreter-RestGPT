@@ -40,9 +40,9 @@ Example 2:
     )
 
 Example 3:
-    objective: if the temprature is above 29 celsius degrees, turn on the red led, else turn on the blue led.
-    original_plan: ["get the temprature", "turn on red led if the temprature is above 29 celsius degrees, else turn on the blue led"]
-    past_steps: [("get the temprature", ("farhenheit: 81.22 , celsius: 27.1"))]
+    objective: if the temperature is above 29 celsius degrees, turn on the red led, else turn on the blue led.
+    original_plan: ["get the temperature", "turn on red led if the temperature is above 29 celsius degrees, else turn on the blue led"]
+    past_steps: [("get the temperature", ("farhenheit: 81.22 , celsius: 27.1"))]
     wrong_answer: False
     response: (
         steps: [turn on blue led]  // explanation: in past steps we got 27.1 celsius degrees, therefore we need to turn on only the blue led according to user request and that will be the final step
@@ -58,10 +58,10 @@ Example 4:
     )
 
 Example 5:
-    objective: if the temprature is above 29 celsius degrees, turn on the red led, else turn on the blue led.
-    original_plan: ["get the temprature", "turn on red led if the temprature is above 29 celsius degrees, else turn on the blue led"]
-    past_steps: [("get the temprature", ("farhenheit: 81.22 , celsius: 27.1")), ("turn on blue led", "blue led has been turned successfully")]
+    objective: if the temperature is above 29 celsius degrees, turn on the red led, else turn on the blue led.
+    original_plan: ["get the temperature", "turn on red led if the temperature is above 29 celsius degrees, else turn on the blue led"]
+    past_steps: [("get the temperature", ("farhenheit: 81.22 , celsius: 27.1")), ("turn on blue led", "blue led has been turned successfully")]
     wrong_answer: False
     response: (
-        response: The temprature is lower than 29 celsius degrees, therefore blue led has been turned on. // explanation: we fullfill the user request, therefore no futher steps are required.
+        response: The temperature is lower than 29 celsius degrees, therefore blue led has been turned on. // explanation: we fullfill the user request, therefore no futher steps are required.
     )

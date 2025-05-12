@@ -154,26 +154,26 @@ paths:
                   lcd:
                     $ref: "#/components/schemas/lcd-result-object"
                   tempature:
-                    $ref: "#/components/schemas/temprature-result-object"
+                    $ref: "#/components/schemas/temperature-result-object"
                   potentiometer:
                     $ref: "#/components/schemas/potentiometer-result-object"
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
 
-  /temprature:
+  /temperature:
     get:
       tags:
         - SmartHome
-      operationId: GET_temprature
-      summary: Get temprature
-      description: Get the current temprature, in Celsius or Fahrenheit.
+      operationId: GET_temperature
+      summary: Get temperature
+      description: Get the current temperature, in Celsius or Fahrenheit.
       responses:
         '200':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/temprature-result-object'
+                $ref: '#/components/schemas/temperature-result-object'
         '404':
           $ref: '#/components/responses/trait_standardErrors_404'
 
@@ -245,13 +245,13 @@ components:
         message:
           type: string
       
-    temprature-result-object:
-      title: temprature-result-object
+    temperature-result-object:
+      title: temperature-result-object
       type: object
       properties:
         farhenheit:
           type: number
-        celcius:
+        celsius:
           type: number
 
     potentiometer-result-object:

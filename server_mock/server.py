@@ -4,13 +4,13 @@ import random
 
 ledColors :list = ["red", "green", "blue"]
 ledStatus :list = ["OFF", "ON"]
-temprature = {"celsius": random.uniform(10, 40), "fahrenheit": random.uniform(50, 104)}
+temperature = {"celsius": random.uniform(10, 40), "fahrenheit": random.uniform(50, 104)}
 potentiometer = random.randint(0, 10000)
 
 lcd = lcdModel(message="Hello World")
 leds = [ledModel(color=color, state=random.choice(ledStatus)) for color in ledColors]
 potentiometer = potentiometerModel(resistance=potentiometer)
-temperature = temperatureModel(celsius=temprature["celsius"], fahrenheit=temprature["fahrenheit"])
+temperature = temperatureModel(celsius=temperature["celsius"], fahrenheit=temperature["fahrenheit"])
 
 
 
