@@ -49,8 +49,9 @@ async def run(*args, **kwargs):
         default_prompt = "turn on red light"
         if not keyboard:
             try:
-                print(f"say 'default' to use default message '{default_prompt}'")
-                inputs = {"input": stt.listen()}
+                
+                input(f"\n{'*' * 35}\n\nPress enter to start talking...\n\n{'*' * 35}")
+                inputs = {"input": stt.listen(default_msg=default_prompt)}
             except Exception as e:
                  print(e)
                  continue
@@ -60,7 +61,7 @@ async def run(*args, **kwargs):
         if inputs["input"] == "exit":
             print("Exiting...")
             break
-        elif inputs["input"] == "default" or inputs["input"] == "":
+        elif inputs["input"] == "":
             inputs["input"] = default_prompt
 
 

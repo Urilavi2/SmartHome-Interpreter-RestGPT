@@ -20,6 +20,8 @@ class SpeechToText(Singleton):
         for mic in sd.query_devices():
             if re.search(mic_pattern, mic['name']):
                 optionals.append(mic['index'])
+        if not optionals:
+            return [self.__defaultMic()]
         return optionals
         
     def __defaultMic(self):
@@ -75,11 +77,8 @@ class SpeechToText(Singleton):
 
         return ""
 
-    def listen(self, org="google", lang="en-US") -> str:
-        text = ""
-        if self.__micIdx[0] == 0:
-            self.__micIdx = [self.__defaultMic()]
-        
+    def listen(self, org="google", lang="en-US", default_msg="") -> str:
+        text = ""       
         if self.__trueMicIdx:
             self.__micIdx = [self.__trueMicIdx]
 
@@ -88,7 +87,8 @@ class SpeechToText(Singleton):
             try:
                 with sr.Microphone(device_index=self.__micIdx[mic_idx]) as source:
                     print("Ajusting mic for ambient noise....")
-                    self.__recognizer.adjust_for_ambient_noise(source, duration=0.5)
+                    self.__recognizer.adjust_for_ambient_noise(source, duration=1)
+                    print(f"say 'default' to use default message '{default_msg}'")
                     print("\n--- SPEAK NOW!--- \n")
                     audio = self.__recognizer.listen(source, timeout=5, phrase_time_limit=8)
                     match org.lower():
@@ -101,6 +101,8 @@ class SpeechToText(Singleton):
                 
                 print("Recognized STT: ", text)
                 self.__trueMicIdx = source.device_index
+                if text == "default":
+                    return default_msg
                 break
 
             except sr.RequestError as e:
@@ -112,10 +114,10 @@ class SpeechToText(Singleton):
             except sr.WaitTimeoutError as e:
                 raise(e)
             except Exception as e:
-                print("Changing microphone...")
+                print("Error while trying to listen. Changing microphone...")
                 mic_idx += 1
                 if mic_idx >= len(self.__micIdx):
                     mic_idx = 0
                     self.__micIdx = [self.__defaultMic()]
-         
+
         return text
