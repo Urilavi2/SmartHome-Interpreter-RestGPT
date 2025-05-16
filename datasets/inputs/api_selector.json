@@ -1,0 +1,140 @@
+[
+    {
+        "input": "turn on the red light",
+        "plan": [
+            "turn on the red led"
+            ],
+        "grade": 5,
+        "only_url": false,
+        "api": [
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
+        ]
+    },
+    
+    {
+        "input": "write the resistance on screen",
+        "plan": [
+            "get the resistance",
+            "Write '4677 Ohm' on the screen"
+        ],
+        "grade": 5,
+        "only_url": false,
+        "api": [
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "4677 Ohm"}}
+        ]
+    },
+
+    {
+        "input": "turn off the green led and write it on screen",
+        "plan": [
+            "turn off the green led",
+            "write on screen that the green led is off"
+        ],
+        "grade": 5,
+        "only_url": false,
+        "api": [
+            {"method": "GET", "URL": "/led", "queries": {"color": "green", "state": "OFF"}},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "the green led is off"}}
+        ]
+    },
+
+    {
+        "input": "turn on all lights and at the end write on lcd 'done'",
+        "plan": [
+            "get a list of all lights",
+            "turn on all the lights in the list",
+            "write on lcd 'done'"
+            ],
+            "grade": 10,
+            "only_url": true,
+            "api": [
+            {"method": "GET", "URL": "/get-all"},
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+            {"method": "GET", "URL": "/led", "queries": {"color": "GREEN", "state": "ON"}},
+            {"method": "GET", "URL": "/led", "queries": {"color": "BLUE", "state": "ON"}},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "done"}}
+        ]
+    },
+
+    {
+        "input": "if the resistance is greater than 5000, turn on the red light. else turn on the blue light. At the end write the resistance on screen",
+        "plan": [
+            "get the resistance",
+            "if greater than 5000, turn on the red light, else turn on the blue light",
+            "write on screen the resistance"
+        ],
+        "only_url": true,
+        "grade": 10,
+        "api": [
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "GET", "URL": "/led"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "5000 Ohm"}}
+        ]
+    },
+
+    {
+        "input": "if the temperature is greater than 30 celsius degrees turn on the red light, else turn on the blue light",
+        "plan": [
+            "get the temperature in celsius",
+            "if the temperature in celsius is greater than 30 degrees, turn on the red light, else turn on the blue light"
+        ],
+        "only_url": true,
+        "api": [
+            {"method": "GET", "URL": "/temperature"},
+            {"method": "GET", "URL": "/led"}
+        ],
+        "grade": 10
+    },
+
+    {
+        "input": "if the screen has the word 'hello' on it and the resistance is less than 3000 print 'bye!', else print 'good'",
+        "plan": [
+            "get the resistance",
+            "check what is on screen",
+            "if the message on screen is 'hello' and the resistance is less than 3000 print 'bye!', else print 'good'"
+        ],
+        "only_url": true,
+        "api": [
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "GET", "URL": "/lcd"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "bye!"}}
+        ],
+        "grade": 15
+    },
+
+    {
+        "input": "if the temperature is exactly 25 celsius degrees and the resistance is less than 2333 print 'nice', else print 'not bad'",
+        "plan": [
+            "get the temperature",
+            "get the resistance",
+            "if the temperature is exactly 25 celsius degrees and the resistance is less than 2333 print 'nice', else print 'not bad'"
+        ],
+        "only_url": true,
+        "grade": 15,
+        "api": [
+            {"method": "GET", "URL": "/temperature"},
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "nice"}}
+        ]
+    },
+
+    {
+        "input": "check for the temperature and the message on screen. if the temperature is greater than 20 celsius degrees and the message include the word 'demo' turn on the red light and write on screen 'done' and the celsius degrees you found. if temperature is greater than 20 celsius degrees and the message includes a number turn on the blue light. if the temperature is less than 20 celsius degrees turn on the red light",
+        "plan": [
+            "get the temperature",
+            "get the message on screen",
+            "if the temperature is greater than 20 celsius degrees and the message include the word 'demo' turn on the red light and write on screen 'done' and the celsius degrees you found. if temperature is greater than 20 celsius degrees and the message includes a number turn on the blue light. if the temperature is less than 20 celsius degrees turn on the red light"
+        ],
+        "only_url": true,
+        "grade": 25,
+        "api": [
+            {"method": "GET", "URL": "/temperature"},
+            {"method": "GET", "URL": "/lcd"},
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "done 30 degrees"}}
+
+        ]
+    }
+
+]

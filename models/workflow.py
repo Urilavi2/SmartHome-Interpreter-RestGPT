@@ -46,10 +46,16 @@ class Workflow:
             self.state.add_node("Decider", self.decider_step)
             self.state.add_conditional_edges("Decider", self.should_end, ["Replan", END])
             self.state.add_edge("Replan", "API Selector")
+        
         elif subject.lower() == "planner":
             self.state.add_node("Planner", self.plan_step)
             self.state.add_edge(START, "Planner")
             self.state.add_edge("Planner", END)
+
+        elif subject.lower() == "api_selector":
+            self.state.add_node("API Selector", self.testing_api_selector)
+            self.state.add_edge(START, "API Selector")
+            self.state.add_edge("API Selector", END)
 
     async def plan_step(self, state: PlanExecute):
         try:
@@ -86,7 +92,15 @@ class Workflow:
                     exit(2)
             if tryCount < 3:
                 continue
-        
+
+    async def testing_api_selector(self, state: PlanExecute):
+        try:
+            endpoint = await self.api_selector.ainvoke({"messages": [("user", state["input"])]})
+            return {"api": [endpoint.endpoint]}
+        except Exception as e:
+            print(e)
+
+
     async def caller_step(self, state: PlanExecute):
         tryCount = 0
         while True:
@@ -192,7 +206,8 @@ class Workflow:
         else:   
             return "Replan"
         
-        
+
+
     def create_graph(self, g: StateGraph.compile):
         a = g.get_graph(xray=True).draw_mermaid_png()
         with open("graph.png", "wb") as f:
