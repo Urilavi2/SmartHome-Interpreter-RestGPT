@@ -7,6 +7,7 @@ from dotenv import load_dotenv, find_dotenv
 from prompts.prompts import Prompts
 from models.workflow import Workflow
 from utils.stt import SpeechToText
+from utils.debugOptions import DebugOptions
 
 RUNTIME_level = 99
 logging.addLevelName(RUNTIME_level, "RUNTIME")
@@ -27,13 +28,15 @@ logger = logging.getLogger(__name__)
 
 async def run(*args, **kwargs):
     _ = load_dotenv(find_dotenv())
+    stt = None
     prompts = Prompts()
-    stt = SpeechToText()
     workflow = Workflow(prompts=prompts)
     keyboard = False
 
     if "keyboard" in args:
         keyboard = True
+    else:
+        stt = SpeechToText()
 
     if "graph" in args:
         create_graph(workflow.app)
@@ -44,7 +47,6 @@ async def run(*args, **kwargs):
         if testConnection(prompts.api_url, count):
             break
       
-
     while True:
         default_prompt = "turn on red light"
         if not keyboard:
@@ -70,4 +72,5 @@ async def run(*args, **kwargs):
         async for event in workflow.app.astream(inputs, config=config):
             for k, v in event.items():
                     if k != "__end__":
-                        print(json.dumps(v, indent=4))
+                        if DebugOptions() != "off" or (k == "Decider" and v["final"]):
+                            print(json.dumps(v["final"], indent=4))
