@@ -37,8 +37,8 @@ def led():
         }), 404
     # Validate the input using Pydantic model
     for led_idx in range(0, len(leds)):
-        if leds[led_idx].color == color:
-            leds[led_idx].state = state
+        if leds[led_idx].color == color.lower():
+            leds[led_idx].state = state.lower()
             return jsonify(leds[led_idx].model_dump()), 200
     return jsonify({
         'message': 'Invalid color or status parameter.'

@@ -3,9 +3,9 @@ from dotenv import load_dotenv, find_dotenv
 from prompts.prompts import Prompts
 from models.workflow import Workflow
 import os
-
 from testing.api_selector import api_selector
 from testing.planner import planner
+from testing.caller import caller
 
 
 async def tests(subject):
@@ -29,3 +29,14 @@ async def tests(subject):
                                    input_file=input_file,
                                    config=config,
                                    output_file=output_file)
+        case "caller":
+              await caller(workflow=workflow,
+                            input_file=input_file,
+                            config=config,
+                            output_file=output_file)
+        case _:
+            print(f"Unknown subject: {subject}")
+            return
+
+
+

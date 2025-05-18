@@ -1,11 +1,11 @@
 from utils.tools import split_args
 from prototype import prototype
 from run import run
-from testing import tests
+from testing.testing import tests
 import asyncio
 
 def main():
-    try:
+    # try:
         args, kwargs = split_args()
         entity = kwargs.get("entity",None)
         if entity is None:
@@ -21,8 +21,8 @@ def main():
             asyncio.run(tests(subject))
         else:
             asyncio.run(prototype(*args, **kwargs))
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
 
 if __name__ == "__main__":
     main()

@@ -23,6 +23,12 @@ class EndpointModel(BaseModel):
         description="An endpoint to send http request to. Should have keys like: http_method, URL, path_variables, queries, headers, body, etc."
     )
 
+class CallerTestModel(BaseModel):
+    "Decide if the answer is logocaly the same or not"
+    decision: bool = Field(
+        description="Decision to make, True if the answer is correct or False if the answer is wrong."
+    )
+
 class PlanExecute(TypedDict):
     input: str
     original_plan: List[str]

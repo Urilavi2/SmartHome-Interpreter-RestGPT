@@ -4,7 +4,7 @@
         "plan": [
             "turn on the red led"
             ],
-        "grade": 5
+        "index": 5
     },
     
     {
@@ -13,7 +13,7 @@
             "get the resistance",
             "write the resistance on screen"
         ],
-        "grade": 5
+        "index": 5
     },
 
     {
@@ -22,7 +22,7 @@
             "turn off the green led",
             "write on screen that the green led is off"
         ],
-        "grade": 5
+        "index": 5
     },
 
     {
@@ -32,7 +32,7 @@
             "turn on all the lights in the list",
             "write on lcd 'done'"
             ],
-            "grade": 10
+            "index": 10
     },
 
     {
@@ -42,7 +42,7 @@
             "if greater than 5000, turn on the red light, else turn on the blue light",
             "write on screen the resistance"
         ],
-        "grade": 10
+        "index": 10
     },
 
     {
@@ -51,7 +51,7 @@
             "get the temperature in celsius",
             "if the temperature in celsius is greater than 30 degrees, turn on the red light, else turn on the blue light"
         ],
-        "grade": 10
+        "index": 10
     },
 
     {
@@ -61,7 +61,7 @@
             "check what is on screen",
             "if the message on screen is 'hello' and the resistance is less than 3000 print 'bye!', else print 'good'"
         ],
-        "grade": 15
+        "index": 15
     },
 
     {
@@ -71,7 +71,7 @@
             "get the resistance",
             "if the temperature is exactly 25 celsius degrees and the resistance is less than 2333 print 'nice', else print 'not bad'"
         ],
-        "grade": 15
+        "index": 15
     },
 
     {
@@ -81,7 +81,7 @@
             "get the message on screen",
             "if the temperature is greater than 20 celsius degrees and the message include the word 'demo' turn on the red light and write on screen 'done' and the celsius degrees you found. if temperature is greater than 20 celsius degrees and the message includes a number turn on the blue light. if the temperature is less than 20 celsius degrees turn on the red light"
         ],
-        "grade": 25
+        "index": 25
     }
 
 ]

@@ -8,6 +8,12 @@
         "only_url": false,
         "api": [
             {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
+        ],
+        "result": [
+            "The red light has been turned on."
+        ],
+        "previous_result": [
+            {"color": "RED", "state": "ON"}
         ]
     },
     
@@ -22,6 +28,14 @@
         "api": [
             {"method": "GET", "URL": "/potentiometer"},
             {"method": "POST", "URL": "/lcd", "body": {"message": "4677 Ohm"}}
+        ],
+        "result": [
+            "The resistance of the potentiometer is 4677 Ohm.",
+            "The message '4677 Ohm' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"resistance": "4677 Ohm"},
+            {"message": "4677 Ohm"}
         ]
     },
 
@@ -36,6 +50,14 @@
         "api": [
             {"method": "GET", "URL": "/led", "queries": {"color": "green", "state": "OFF"}},
             {"method": "POST", "URL": "/lcd", "body": {"message": "the green led is off"}}
+        ],
+        "result": [
+            "The green light has been turned off.",
+            "The message 'the green led is off' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"color": "green", "state": "OFF"},
+            {"message": "the green led is off"}
         ]
     },
 
@@ -54,6 +76,20 @@
             {"method": "GET", "URL": "/led", "queries": {"color": "GREEN", "state": "ON"}},
             {"method": "GET", "URL": "/led", "queries": {"color": "BLUE", "state": "ON"}},
             {"method": "POST", "URL": "/lcd", "body": {"message": "done"}}
+        ],
+        "result": [
+            {"colors": ["RED", "GREEN", "BLUE"]},
+            {"color": "RED", "state": "ON"},
+            {"color": "GREEN", "state": "ON"},
+            {"color": "BLUE", "state": "ON"},
+            {"message": "done"}
+        ],
+        "previous_result": [
+            {"colors": ["RED", "GREEN", "BLUE"]},
+            {"color": "RED", "state": "ON"},
+            {"color": "GREEN", "state": "ON"},
+            {"color": "BLUE", "state": "ON"},
+            {"message": "done"}
         ]
     },
 
@@ -68,8 +104,18 @@
         "index": 2,
         "api": [
             {"method": "GET", "URL": "/potentiometer"},
-            {"method": "GET", "URL": "/led"},
-            {"method": "POST", "URL": "/lcd", "body": {"message": "5000 Ohm"}}
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "5010 Ohm"}}
+        ],
+        "result": [
+            "The resistance of the potentiometer is 5010 Ohm.",
+            "The red light has been turned on.",
+            "The message '5010 Ohm' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"resistance": "5010 Ohm"},
+            {"color": "RED", "state": "ON"},
+            {"message": "5010 Ohm"}
         ]
     },
 
@@ -82,7 +128,15 @@
         "only_url": true,
         "api": [
             {"method": "GET", "URL": "/temperature"},
-            {"method": "GET", "URL": "/led"}
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
+        ],
+        "result": [
+            "The current temperature is 31\u00b0C (86\u00b0F).",
+            "The red light has been turned on."
+        ],
+        "previous_result": [
+            {"celcius": 31, "farenheit": 86},
+            {"color": "RED", "state": "ON"}
         ],
         "index": 2
     },
@@ -98,8 +152,18 @@
         "api": [
             {"method": "GET", "URL": "/potentiometer"},
             {"method": "GET", "URL": "/lcd"},
-            {"method": "POST", "URL": "/lcd", "body": {"message": "bye!"}}
+            {"method": "POST", "URL": "/lcd", "body": {"message": "good"}}
         ],
+        "result": [
+            "The resistance of the potentiometer is 2000 Ohm.",
+            "The message on the LCD screen is NOT 'hello world'.",
+            "The message 'good' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"resistance": "2000 Ohm"},
+            {"message": "the resistance is 2000 Ohm"},
+            {"message": "good"}
+        ],        
         "index": 3
     },
 
@@ -115,7 +179,17 @@
         "api": [
             {"method": "GET", "URL": "/temperature"},
             {"method": "GET", "URL": "/potentiometer"},
-            {"method": "POST", "URL": "/lcd", "body": {"message": "nice"}}
+            {"method": "POST", "URL": "/lcd", "body": {"message": "not bad"}}
+        ],
+        "result": [
+            "The current temperature is 31\u00b0C (86\u00b0F).",
+            "The resistance of the potentiometer is 2000 Ohm.",
+            "The nessage 'not bad' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"celcius": 31, "farenheit": 86},
+            {"resistance": "2000 Ohm"},
+            {"message": "not bad"}
         ]
     },
 
@@ -131,9 +205,17 @@
         "api": [
             {"method": "GET", "URL": "/temperature"},
             {"method": "GET", "URL": "/lcd"},
-            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
-            {"method": "POST", "URL": "/lcd", "body": {"message": "done 30 degrees"}}
-
+            {"method": "GET", "URL": "/led", "queries": {"color": "blue", "state": "ON"}}
+        ],
+        "result": [
+            "The current temperature is 31\u00b0C (86\u00b0F).",
+            "The message on the LCD screen is 'the resistance is 2000 Ohm'.",
+            "The blue light has been turned on."
+        ],
+        "previous_result": [
+            {"celcius": 31, "farenheit": 86},
+            {"message": "the resistance is 2000 Ohm"},
+            {"color": "blue", "state": "ON"}
         ]
     }
 

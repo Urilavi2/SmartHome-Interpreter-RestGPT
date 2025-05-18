@@ -6,7 +6,7 @@ from utils.tools import http_toolkit
 from langchain_openai import ChatOpenAI
 from prompts.prompts import Prompts
 from langgraph.prebuilt import create_react_agent
-from models.blocks import PlanModel, ParserModel, EndpointModel, ActModel, PlanExecute, DecisionModel
+from models.blocks import PlanModel, ParserModel, EndpointModel, ActModel, PlanExecute, DecisionModel, CallerTestModel
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +25,8 @@ class Workflow:
         self.decider = prompts.decider | self.llm.with_structured_output(DecisionModel)
 
         self.replanner = prompts.replanner | self.llm.with_structured_output(PlanModel)
+
+        self.caller_test = prompts.caller_test | self.llm.with_structured_output(CallerTestModel)
         
         self.state = StateGraph(PlanExecute)
         self.configure_workflow(subject)    
@@ -56,6 +58,11 @@ class Workflow:
             self.state.add_node("API Selector", self.testing_api_selector)
             self.state.add_edge(START, "API Selector")
             self.state.add_edge("API Selector", END)
+        
+        elif subject.lower() == "caller":
+            self.state.add_node("Caller", self.testing_caller_step)
+            self.state.add_edge(START, "Caller")
+            self.state.add_edge("Caller", END)
 
     async def plan_step(self, state: PlanExecute):
         try:
@@ -100,7 +107,6 @@ class Workflow:
         except Exception as e:
             print(e)
 
-
     async def caller_step(self, state: PlanExecute):
         tryCount = 0
         while True:
@@ -127,6 +133,13 @@ class Workflow:
                     exit(3)
             if tryCount < 3:
                 continue
+                
+    async def testing_caller_step(self, state: PlanExecute):
+        try:
+            calling = await self.agent_caller.ainvoke({"messages": [("user", str(state["input"]))]})
+            return {"current_agent_answer": [calling["messages"][-1].content]}
+        except Exception as e:
+            print(e)
 
     async def parser_step(self, state: PlanExecute):
         tryCount = 0

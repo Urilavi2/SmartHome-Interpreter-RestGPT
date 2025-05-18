@@ -14,6 +14,7 @@ class Prompts:
         self.parser = self.__createChatPromptTemplate("parser")
         self.decider = self.__createChatPromptTemplate("decider")
         self.replanner = self.__create_replanner_ChatPromptTemplate()
+        self.caller_test = self.__createChatPromptTemplate("logical_identical_caller_test")
 
     def __create_endpoint_desc(self, api_ref:ReducedOpenAPISpec) -> str:
         return self.__format_endpoints(api_ref)
@@ -66,7 +67,7 @@ class Prompts:
         return replanner_prompt
     
     def __read_prompt(self, prompt_type: str) -> str:
-        options = ["planner", "api_selector", "caller", "replanner", "parser", "decider"]
+        options = ["planner", "api_selector", "caller", "replanner", "parser", "decider", "logical_identical_caller_test"]
         prompt_type = prompt_type.lower()
         if prompt_type not in options:
             raise ValueError(f"Invalid prompt type: {prompt_type}")
