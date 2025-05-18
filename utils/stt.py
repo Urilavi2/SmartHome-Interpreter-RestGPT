@@ -1,17 +1,22 @@
 import speech_recognition as sr
 import pyttsx3 
 from utils.singleton import Singleton
+from utils.debugOptions import DebugOptions
 import sounddevice as sd
 import os
-import pdb
 import re
+from time import sleep
 
 class SpeechToText(Singleton):
     def __init__(self):
+        if hasattr(self, '_initialized') and self._initialized:
+            return  # Prevent re-initialization
         self.__recognizer = sr.Recognizer()
         self.__micIdx = self.__selectKnownMic("FIFINE K669 Microphone")
         self.__recognizer.vosk_model = self.__findVosk()
         self.__trueMicIdx = None
+
+        self._initialized = True
 
 
     def __selectKnownMic(self, mic_name):
@@ -28,7 +33,8 @@ class SpeechToText(Singleton):
         mic_pattern = re.compile(r'Microsoft Sound Mapper - Input')
         for mic in sd.query_devices():
             if re.search(mic_pattern, mic['name']):
-                print(f"USING DEFAULT: {mic['name']}")
+                if DebugOptions() != "off":
+                    print(f"USING DEFAULT: {mic['name']}")
                 return mic['index']
 
     def __selectMic(self) -> int:
@@ -86,9 +92,11 @@ class SpeechToText(Singleton):
         while True:
             try:
                 with sr.Microphone(device_index=self.__micIdx[mic_idx]) as source:
-                    print("Ajusting mic for ambient noise....")
+                    if DebugOptions() != "off":
+                        print("Ajusting mic for ambient noise....")
                     self.__recognizer.adjust_for_ambient_noise(source, duration=1)
                     print(f"say 'default' to use default message '{default_msg}'")
+                    sleep(0.5)
                     print("\n--- SPEAK NOW!--- \n")
                     audio = self.__recognizer.listen(source, timeout=5, phrase_time_limit=8)
                     match org.lower():
