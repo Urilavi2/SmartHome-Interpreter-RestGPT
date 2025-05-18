@@ -2,10 +2,13 @@ from utils.tools import split_args
 from prototype import prototype
 from run import run
 import asyncio
+from utils.debugOptions import DebugOptions
 
 def main():
     try:
         args, kwargs = split_args()
+        debug_level = kwargs.get("debug", "off").lower()
+        DebugOptions(debug_level)
         entity = kwargs.get("entity",None)
         if entity is None:
             print("No entity specified")
