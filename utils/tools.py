@@ -70,7 +70,18 @@ def grading_system(input_json:dict) -> dict:
 
         weight_sum = sum(index * index_counter[index] for index in set_indexs)
         weights = {index: round(100 * index / weight_sum) for index in set_indexs}
+        print("Index Counter: ", index_counter)
+        print("Grading Weights: ", weights)
         return weights
     except Exception as e:
         print(f"Error reading input file: {e}")
         return {}
+    
+def progress_bar(iteration, total, prefix='', length=50, fill='█', print_end="\r"):
+    percent = ("{0:.1f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    sys.stdout.write(f'\r{prefix} |{bar}| {percent}% Complete')
+    sys.stdout.flush()
+    if iteration == total: 
+        print(print_end)

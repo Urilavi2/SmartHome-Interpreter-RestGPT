@@ -13,8 +13,9 @@
             "The red light has been turned on."
         ],
         "previous_result": [
-            {"color": "RED", "state": "ON"}
+            {"led_color": "RED", "state": "ON"}
         ]
+        
     },
     
     {
@@ -24,7 +25,7 @@
     "index": 1,
     "api": [{"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "OFF"}}],
     "result": ["The red light has been turned off."],
-    "previous_result": [{"color": "RED", "state": "OFF"}]
+    "previous_result": [{"led_color": "RED", "state": "OFF"}]
     },
 
     {
@@ -44,7 +45,7 @@
     "index": 1,
     "api": [{"method": "GET", "URL": "/temperature"}],
     "result": ["The current temperature is 24°C (75.2°F)."],
-    "previous_result": [{"celcius": 24, "farenheit": 75.2}]
+    "previous_result": [{"celsius": 24.0, "fahrenheit": 75.2}]
     },
 
     {
@@ -54,7 +55,7 @@
     "index": 1,
     "api": [{"method": "GET", "URL": "/led", "queries": {"color": "yellow", "state": "OFF"}}],
     "result": ["No yellow led has been found."],
-    "previous_result": [{"message": "No yellow led has been found."}]
+    "previous_result": [{"error": "No yellow led has been found."}]
     },
 
     {
@@ -116,7 +117,7 @@
             "The message 'the green led is off' has been written on the LCD screen."
         ],
         "previous_result": [
-            {"color": "green", "state": "OFF"},
+            {"led_color": "GREEN", "state": "OFF"},
             {"message": "the green led is off"}
         ]
     },
@@ -138,17 +139,17 @@
             {"method": "POST", "URL": "/lcd", "body": {"message": "done"}}
         ],
         "result": [
-            {"colors": ["RED", "GREEN", "BLUE"]},
-            {"color": "RED", "state": "ON"},
-            {"color": "GREEN", "state": "ON"},
-            {"color": "BLUE", "state": "ON"},
+            "The available lights are three LEDs: red (currently off), green (currently off), and blue (currently off).",
+            {"led_color": "RED", "state": "ON"},
+            {"led_color": "GREEN", "state": "ON"},
+            {"led_color": "BLUE", "state": "ON"},
             {"message": "done"}
         ],
         "previous_result": [
-            {"colors": ["RED", "GREEN", "BLUE"]},
-            {"color": "RED", "state": "ON"},
-            {"color": "GREEN", "state": "ON"},
-            {"color": "BLUE", "state": "ON"},
+            {"lights": ["RED", "GREEN", "BLUE"]},
+            {"led_color": "RED", "state": "ON"},
+            {"led_color": "GREEN", "state": "ON"},
+            {"led_color": "BLUE", "state": "ON"},
             {"message": "done"}
         ]
     },
@@ -174,7 +175,7 @@
         ],
         "previous_result": [
             {"resistance": "5010 Ohm"},
-            {"color": "RED", "state": "ON"},
+            {"led_color": "RED", "state": "ON"},
             {"message": "5010 Ohm"}
         ]
     },
@@ -191,12 +192,12 @@
             {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
         ],
         "result": [
-            "The current temperature is 31\u00b0C (86\u00b0F).",
+            "The current temperature is 31\u00b0C",
             "The red light has been turned on."
         ],
         "previous_result": [
-            {"celcius": 31, "farenheit": 86},
-            {"color": "RED", "state": "ON"}
+            {"celsius": 31.0},
+            {"led_color": "RED", "state": "ON"}
         ],
         "index": 2
     },
@@ -219,7 +220,7 @@
     ],
     "previous_result": [
         {"resistance": "5100 Ohm"},
-        {"color": "GREEN", "state": "ON"}
+        {"led_color": "GREEN", "state": "ON"}
     ]
     },
 
@@ -238,7 +239,7 @@
         ],
         "result": [
             "The resistance of the potentiometer is 2000 Ohm.",
-            "The message on the LCD screen is NOT 'hello world'.",
+            "The message on the LCD screen is 'the resistance is 2000 Ohm'.",
             "The message 'good' has been written on the LCD screen."
         ],
         "previous_result": [
@@ -277,7 +278,7 @@
     ],
     "previous_result": [
         {"message": "alert"},
-        {"color": "RED", "state": "ON"}
+        {"led_color": "RED", "state": "ON"}
     ]
     },
 
@@ -301,7 +302,7 @@
             "The nessage 'not bad' has been written on the LCD screen."
         ],
         "previous_result": [
-            {"celcius": 31, "farenheit": 86},
+            {"celsius": 31.0, "fahrenheit": 86.0},
             {"resistance": "2000 Ohm"},
             {"message": "not bad"}
         ]
@@ -337,9 +338,9 @@
         "The blue light has been turned on."
     ],
     "previous_result": [
-        {"celcius": 22, "farenheit": 71.6},
-        {"message": "start"},
-        {"color": "BLUE", "state": "ON"}
+        {"celsius": 22.0, "fahrenheit": 71.6},
+        {"message": "start joking about you"},
+        {"led_color": "BLUE", "state": "ON"}
     ]
     },
 
@@ -350,7 +351,7 @@
     "index": 1,
     "api": [{"method": "GET", "URL": "/led", "queries": {"color": "green", "state": "OFF"}}],
     "result": ["The green light has been turned off."],
-    "previous_result": [{"color": "green", "state": "OFF"}]
+    "previous_result": [{"led_color": "GREEN", "state": "OFF"}]
     },
 
     {
@@ -374,8 +375,8 @@
     ],
     "previous_result": [
         {"resistance": "1200 Ohm"},
-        {"color": "GREEN", "state": "OFF"},
-        {"color": "GREEN", "state": "ON"}
+        {"led_color": "GREEN", "state": "OFF"},
+        {"led_color": "GREEN", "state": "ON"}
     ]
     },
 
@@ -413,8 +414,8 @@
     ],
     "previous_result": [
         {"message": "low battery"},
-        {"celcius": 32, "farenheit": 89.6},
-        {"color": "RED", "state": "ON"},
+        {"celsius": 32.0, "fahrenheit": 89.6},
+        {"led_color": "RED", "state": "ON"},
         {"message": "danger"}
     ]
     },
@@ -461,9 +462,9 @@
             "The blue light has been turned on."
         ],
         "previous_result": [
-            {"celcius": 31, "farenheit": 86},
+            {"celsius": 31.0, "fahrenheit": 86.0},
             {"message": "the resistance is 2000 Ohm"},
-            {"color": "blue", "state": "ON"}
+            {"led_color": "BLUE", "state": "ON"}
         ]
     },
     {
@@ -485,8 +486,8 @@
         "The message 'ok' has been written on the LCD screen."
     ],
     "previous_result": [
-        {"celcius": 20, "farenheit": 68},
-        {"color": "green", "state": "ON"},
+        {"celsius": 20.0, "fahrenheit": 68.0},
+        {"led_color": "GREEN", "state": "ON"},
         {"message": "ok"}
     ]
     },
@@ -512,9 +513,9 @@
         "The message 'cool-low' has been written on the LCD screen."
     ],
     "previous_result": [
-        {"celcius": 29, "farenheit": 84.2},
+        {"celsius": 29.0, "fahrenheit": 84.2},
         {"resistance": "2500 Ohm"},
-        {"color": "BLUE", "state": "ON"},
+        {"led_color": "BLUE", "state": "ON"},
         {"message": "cool-low"}
     ]
     },
@@ -540,8 +541,8 @@
     ],
     "previous_result": [
         {"message": "cool-low"},
-        {"celcius": 20, "farenheit": 68},
-        {"color": "RED", "state": "ON"}
+        {"celsius": 20.0, "fahrenheit": 68.0},
+        {"led_color": "RED", "state": "ON"}
     ]
     },
 
@@ -581,9 +582,9 @@
     ],
     "previous_result": [
         {"resistance": "2400 Ohm"},
-        {"celcius": 33, "farenheit": 91.4},
-        {"message": " mode"},
-        {"color": "RED", "state": "ON"},
+        {"celsius": 33.0, "fahrenheit": 91.4},
+        {"message": "heat mode"},
+        {"led_color": "RED", "state": "ON"},
         {"message": "overheat"}
         ]
     },
@@ -610,9 +611,9 @@
         "The message 'alert' has been written on the LCD screen."
     ],
     "previous_result": [
-        {"celcius": 30, "farenheit": 86},
+        {"celsius": 30.0, "fahrenheit": 86.0},
         {"resistance": "3500 Ohm"},
-        {"color": "RED", "state": "ON"},
+        {"led_color": "RED", "state": "ON"},
         {"message": "alert"}
     ]
     },
@@ -662,9 +663,9 @@
     ],
     "previous_result": [
         {"message": "alert"},
-        {"celcius": 27, "farenheit": 80.6},
+        {"celsius": 27.0, "fahrenheit": 80.6},
         {"resistance": "1500 Ohm"},
-        {"color": "BLUE", "state": "ON"},
+        {"led_color": "BLUE", "state": "ON"},
         {"message": "go now"}
     ]
     }

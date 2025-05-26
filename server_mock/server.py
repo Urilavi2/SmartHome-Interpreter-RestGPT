@@ -56,6 +56,9 @@ def ledStatus():
     for led_idx in range(0, len(leds)):
         if leds[led_idx].color == color:
             return jsonify(leds[led_idx].model_dump()), 200
+    return jsonify({
+    'message': f'Color {color} do not exist.'
+    }), 404
 
 
 @app.route("/lcd", methods=["GET", "POST"])

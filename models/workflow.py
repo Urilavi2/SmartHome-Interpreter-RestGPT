@@ -6,7 +6,7 @@ from utils.tools import http_toolkit
 from langchain_openai import ChatOpenAI
 from prompts.prompts import Prompts
 from langgraph.prebuilt import create_react_agent
-from models.blocks import PlanModel, ParserModel, EndpointModel, ActModel, PlanExecute, DecisionModel, CallerTestModel
+from models.blocks import PlanModel, ParserModel, EndpointModel, PlanExecute, DecisionModel, CallerTestModel
 
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ class Workflow:
 
 
     def configure_workflow(self, subject):
-        if not subject:
+        if not subject or subject.lower() == "full":
             self.state.add_node("Planner", self.plan_step)
             self.state.add_edge(START, "Planner")
             self.state.add_node("API Selector", self.api_selector_step)
@@ -63,6 +63,11 @@ class Workflow:
             self.state.add_node("Caller", self.testing_caller_step)
             self.state.add_edge(START, "Caller")
             self.state.add_edge("Caller", END)
+
+        elif subject.lower() == "parser":
+            self.state.add_node("Parser", self.testing_parser_step)
+            self.state.add_edge(START, "Parser")
+            self.state.add_edge("Parser", END)            
 
     async def plan_step(self, state: PlanExecute):
         try:
@@ -163,6 +168,12 @@ class Workflow:
                     exit(4)
             if tryCount < 3:
                 continue
+
+    async def testing_parser_step(self, state: PlanExecute):
+        task = state["input"]["task"]
+        input_for_parser = {"task": task, "api output": state["input"]["api output"]}
+        parse = await self.parser.ainvoke({"messages": [("user", str(input_for_parser))]})
+        return {"current_agent_answer": dict(parse.res), "past_steps": [(task, str(parse.res))]}
 
     async def decider_step(self, state: PlanExecute):
         try:

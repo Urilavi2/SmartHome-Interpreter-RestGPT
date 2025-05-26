@@ -1,5 +1,5 @@
 include .env
-CLEAN_FILES := logs/* graph.png
+CLEAN_FILES := logs/* graph.png datasets/outputs/*
 DEBUG := off
 SUBJECT:= 
 
@@ -62,3 +62,7 @@ keyboard: check-connection
 test: check-connection
 	@echo "Starting Smart Home With Local Server to test $(SUBJECT)..."
 	@py ./main.py entity=testing subject=$(SUBJECT)
+
+full-test: check-connection
+	@echo "Starting Smart Home With Local Server to test each unit..."
+	@py ./main.py entity=testing subject=all

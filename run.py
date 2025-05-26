@@ -72,5 +72,8 @@ async def run(*args, **kwargs):
         async for event in workflow.app.astream(inputs, config=config):
             for k, v in event.items():
                     if k != "__end__":
-                        if DebugOptions() != "off" or (k == "Decider" and v["final"]):
+                        if DebugOptions() != "off":
+                            print(json.dumps(v, indent=4))
+                        elif  (k == "Decider" and v["final"]):
                             print(json.dumps(v["final"], indent=4))
+                        

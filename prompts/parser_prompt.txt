@@ -29,6 +29,11 @@ Example 4:
 Example 5:
     task: List all supported commands
     input: Did not find an API to call.
-    response: (Error: No API call has been found) (it is a python dict)
+    response: (error: No API call has been found) (it is a python dict)
+
+Example 6:
+    task: get the temperature
+    input: The current temperature is 24°C (75.2°F).
+    response: (celsius: 24.0, fahrenheit: 75.2) (it is a python dict)
 
 notice that all the ids in these examples are fake.
