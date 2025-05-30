@@ -6,6 +6,7 @@ from PIL import Image
 from langgraph.graph import StateGraph
 import json
 import traceback
+from utils.debugOptions import DebugOptions
 
 ALLOW_DANGEROUS_REQUEST = True
 
@@ -70,8 +71,9 @@ def grading_system(input_json:dict) -> dict:
 
         weight_sum = sum(index * index_counter[index] for index in set_indexs)
         weights = {index: round(100 * index / weight_sum) for index in set_indexs}
-        print("Index Counter: ", index_counter)
-        print("Grading Weights: ", weights)
+        if DebugOptions() != "off":
+            print("Index Counter: ", index_counter)
+            print("Grading Weights: ", weights)
         return weights
     except Exception as e:
         print(f"Error reading input file: {e}")

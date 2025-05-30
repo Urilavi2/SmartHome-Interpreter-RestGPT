@@ -61,8 +61,4 @@ keyboard: check-connection
 
 test: check-connection
 	@echo "Starting Smart Home With Local Server to test $(SUBJECT)..."
-	@py ./main.py entity=testing subject=$(SUBJECT)
-
-full-test: check-connection
-	@echo "Starting Smart Home With Local Server to test each unit..."
-	@py ./main.py entity=testing subject=all
+	@py ./main.py entity=testing subject=$(SUBJECT) debug=$(DEBUG)

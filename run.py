@@ -74,6 +74,6 @@ async def run(*args, **kwargs):
                     if k != "__end__":
                         if DebugOptions() != "off":
                             print(json.dumps(v, indent=4))
-                        elif  (k == "Decider" and v["final"]):
+                        elif  (k == "Decider" and v.get("final", "")):
                             print(json.dumps(v["final"], indent=4))
                         

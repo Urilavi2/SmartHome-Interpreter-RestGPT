@@ -12,7 +12,7 @@ You have currently done the follow steps:
 {past_steps}
 
 Update your plan according to past_steps knowledge.(for example, if the user asked about the resistance and got 4950 Ohm, than the resistance for futher steps will be 4950)
-If any comparation is needed as the user requested do it here. (e.g. do A if the resistance is bigger than X, else do Y - compare the known resistance from previous step with X and plan the next step base on it). 
+If any comparison is needed as the user requested do it here. (e.g. do A if the resistance is bigger than X, else do Y - compare the known resistance from previous step with X and plan the next step base on it). 
 If you have the answer to the input query, return it. If there a more steps to do, do not tell me to do them, fill out the plan and continue the process.
 Do not return previously done steps as part of the plan. Do not add more steps than needed to get the answer.
 Notice that both id and name usually come together and you will have them both in the past_steps. If you have an answer or information, there is no need to confirm it.
