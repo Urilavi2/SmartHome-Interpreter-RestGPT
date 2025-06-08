@@ -3,6 +3,7 @@ import logging
 from PIL import Image
 from langgraph.graph import END, StateGraph, START
 from utils.tools import http_toolkit
+from utils.debugOptions import DebugOptions
 from langchain_openai import ChatOpenAI
 from prompts.prompts import Prompts
 from langgraph.prebuilt import create_react_agent
@@ -87,6 +88,9 @@ class Workflow:
         tryCount = 0
         while True:
             try:
+                if not state["plan"]:
+                    logger.runlog(f"No more tasks to process. Exiting...")
+                    raise ValueError("No more tasks to process.")
                 task = state["plan"][0]
                 logger.runlog(f"The current step: {task}")
                 endpoint = await self.api_selector.ainvoke({"messages": [("user",task)]})
@@ -96,8 +100,9 @@ class Workflow:
             except Exception as e:
                 tryCount += 1
                 logger.runlog(f"Error in API Selector step: {e}")
-                print(f"Error in API Selector step: {e}")
-                print(f"Could not select the API. Trying again...")
+                if DebugOptions() != "off":
+                    print(f"Error in API Selector step: {e}")
+                    print(f"Could not select the API. Trying again...")
                 if tryCount == 3:
                     print(f"API Selector failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
@@ -130,8 +135,9 @@ class Workflow:
             except Exception as e:
                 tryCount += 1
                 logger.runlog(f"Error in API Caller step: {e}")
-                print(f"Error in API Caller step: {e}")
-                print(f"Could not call the API. Trying again...")
+                if DebugOptions() != "off":
+                    print(f"Error in API Caller step: {e}")
+                    print(f"Could not call the API. Trying again...")
                 if tryCount == 3:
                     print(f"API Caller failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
@@ -148,10 +154,13 @@ class Workflow:
 
     async def parser_step(self, state: PlanExecute):
         tryCount = 0
+        error = ""
         while True:
             try:
                 task = state["plan"][0]
-                input_for_parser = {"task": task, "api output": state["current_agent_answer"]}
+                input_for_parser = {"task": task, "api output": state["current_agent_answer"], "error": error}
+                if not error:
+                    input_for_parser.pop("error", None)
                 logger.runlog(f"Parser Input:\n---------------\nParser input: {input_for_parser}")
                 parse = await self.parser.ainvoke({"messages": [("user", str(input_for_parser))]})
                 logger.runlog(f"Parser Response:\n---------------\n\
@@ -161,8 +170,13 @@ class Workflow:
             except Exception as e:
                 logger.runlog(f"Error in Parser step: {e}")
                 tryCount += 1
-                print(f"Error in Parser step: {e}")
-                print(f"Could not parse the API response. Trying again...")
+                if DebugOptions() != "off":
+                    print(f"Error in Parser step: {e}")
+                    print(f"Could not parse the API response. Trying again...")
+                if e.__class__.__name__ == 'ValidationError':
+                    error = (f"You failed to process the request and resulted with the following error: {e.__class__.__name__}: "
+                    f"{str([f"{err.get("msg", "No msg")} [type={err.get("type", "No type")}, input_value={str(err.get("input", "No input"))}, input_type={str(type(err.get("input", "No input")))}]" for err in e.errors()])}"
+                        ". Please try again while fixing this exception.")
                 if tryCount == 3:
                     print(f"Parser failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
@@ -200,7 +214,8 @@ class Workflow:
         except Exception as e:
             tryCount += 1
             logger.runlog(f"Error in Decider step: {e}")
-            print(f"Error in Decider step: {e}")
+            if DebugOptions() != "off":
+                print(f"Error in Decider step: {e}")
             if tryCount == 3:
                 print(f"Could not decide what to do. Please check the input and try again.")
                 print("Exiting the program.")
@@ -217,8 +232,9 @@ class Workflow:
         except Exception as e:
             tryCount += 1
             logger.runlog(f"Error in Replan step: {e}")
-            print(f"Error in Replan step: {e}")
-            print(f"Could not replan the task. Trying again...")
+            if DebugOptions() != "off":
+                print(f"Error in Replan step: {e}")
+                print(f"Could not replan the task. Trying again...")
             if tryCount == 3:
                 print(f"Replan failed after {tryCount} tries. Exiting...")
                 print("Please check your API URL and internet connection and try again.")
