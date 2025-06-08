@@ -1,6 +1,7 @@
 include .env
-CLEAN_FILES := logs/* graph.png
+CLEAN_FILES := logs/* graph.png datasets/outputs/*
 DEBUG := off
+SUBJECT:= 
 
 planner:
 	@echo "Starting Smart Home Prototype with Planner only..."
@@ -57,3 +58,7 @@ check-connection:
 keyboard: check-connection
 	@echo "Starting Smart Home With Local Server..."
 	@py ./main.py entity=framework keyboard debug=$(DEBUG)
+
+test: check-connection
+	@echo "Starting Smart Home With Local Server to test $(SUBJECT)..."
+	@py ./main.py entity=testing subject=$(SUBJECT) debug=$(DEBUG)

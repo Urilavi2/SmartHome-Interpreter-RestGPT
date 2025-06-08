@@ -156,9 +156,9 @@ void setTemperature(){
   sensors.begin();
 }
 
-float getTemperature(bool celcius) {
+float getTemperature(bool celsius) {
   sensors.requestTemperatures();
-  if (celcius) {
+  if (celsius) {
     temperatureC = sensors.getTempCByIndex(0);
     return temperatureC;
   }

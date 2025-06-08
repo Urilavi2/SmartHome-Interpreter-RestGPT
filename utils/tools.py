@@ -4,6 +4,9 @@ from langchain_community.agent_toolkits.openapi.toolkit import RequestsToolkit
 from langchain_community.utilities.requests import TextRequestsWrapper
 from PIL import Image
 from langgraph.graph import StateGraph
+import json
+import traceback
+from utils.debugOptions import DebugOptions
 
 ALLOW_DANGEROUS_REQUEST = True
 
@@ -53,3 +56,34 @@ def create_graph(g: StateGraph.compile):
     with open("graph.png", "wb") as f:
         f.write(a)
     Image.open("graph.png").show()
+
+def grading_system(input_json:dict) -> dict:
+    try:
+        indexs = list()
+        index_counter = {}
+        for query in input_json:
+            index = int(query["index"])
+            indexs.append(index)
+        set_indexs = list(set(indexs))
+        set_indexs.sort()
+        for index in set_indexs:
+            index_counter[index] = indexs.count(index)
+
+        weight_sum = sum(index * index_counter[index] for index in set_indexs)
+        weights = {index: round(100 * index / weight_sum) for index in set_indexs}
+        if DebugOptions() != "off":
+            print("Index Counter: ", index_counter)
+            print("Grading Weights: ", weights)
+        return weights
+    except Exception as e:
+        print(f"Error reading input file: {e}")
+        return {}
+    
+def progress_bar(iteration, total, prefix='', length=50, fill='█', print_end="\r"):
+    percent = ("{0:.1f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    sys.stdout.write(f'\r{prefix} |{bar}| {percent}% Complete')
+    sys.stdout.flush()
+    if iteration == total: 
+        print(print_end)

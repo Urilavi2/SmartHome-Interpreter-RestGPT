@@ -4,13 +4,13 @@ import random
 
 ledColors :list = ["red", "green", "blue"]
 ledStatus :list = ["OFF", "ON"]
-temprature = {"celsius": random.uniform(10, 40), "fahrenheit": random.uniform(50, 104)}
+temperature = {"celsius": random.uniform(10, 40), "fahrenheit": random.uniform(50, 104)}
 potentiometer = random.randint(0, 10000)
 
 lcd = lcdModel(message="Hello World")
 leds = [ledModel(color=color, state=random.choice(ledStatus)) for color in ledColors]
 potentiometer = potentiometerModel(resistance=potentiometer)
-temperature = temperatureModel(celsius=temprature["celsius"], fahrenheit=temprature["fahrenheit"])
+temperature = temperatureModel(celsius=temperature["celsius"], fahrenheit=temperature["fahrenheit"])
 
 
 
@@ -37,8 +37,8 @@ def led():
         }), 404
     # Validate the input using Pydantic model
     for led_idx in range(0, len(leds)):
-        if leds[led_idx].color == color:
-            leds[led_idx].state = state
+        if leds[led_idx].color == color.lower():
+            leds[led_idx].state = state.lower()
             return jsonify(leds[led_idx].model_dump()), 200
     return jsonify({
         'message': 'Invalid color or status parameter.'
@@ -56,6 +56,9 @@ def ledStatus():
     for led_idx in range(0, len(leds)):
         if leds[led_idx].color == color:
             return jsonify(leds[led_idx].model_dump()), 200
+    return jsonify({
+    'message': f'Color {color} do not exist.'
+    }), 404
 
 
 @app.route("/lcd", methods=["GET", "POST"])

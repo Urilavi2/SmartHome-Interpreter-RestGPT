@@ -1,0 +1,674 @@
+[
+    {
+        "input": "turn on the red light",
+        "plan": [
+            "turn on the red led"
+            ],
+        "index": 1,
+        "only_url": false,
+        "api": [
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
+        ],
+        "result": [
+            "The red light has been turned on."
+        ],
+        "previous_result": [
+            {"led_color": "RED", "state": "ON"}
+        ]
+        
+    },
+    
+    {
+    "input": "turn off the red light",
+    "plan": ["turn off the red led"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "OFF"}}],
+    "result": ["The red light has been turned off."],
+    "previous_result": [{"led_color": "RED", "state": "OFF"}]
+    },
+
+    {
+    "input": "write 'system ok' on screen",
+    "plan": ["write 'system ok' on lcd"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "POST", "URL": "/lcd", "body": {"message": "system ok"}}],
+    "result": ["The message 'system ok' has been written on the LCD screen."],
+    "previous_result": [{"message": "system ok"}]
+    },
+
+    {
+    "input": "get the temperature",
+    "plan": ["read temperature sensor"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "GET", "URL": "/temperature"}],
+    "result": ["The current temperature is 24°C (75.2°F)."],
+    "previous_result": [{"celsius": 24.0, "fahrenheit": 75.2}]
+    },
+
+    {
+    "input": "turn off the yellow led",
+    "plan": ["turn off yellow led"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "GET", "URL": "/led", "queries": {"color": "yellow", "state": "OFF"}}],
+    "result": ["No yellow led has been found."],
+    "previous_result": [{"error": "No yellow led has been found."}]
+    },
+
+    {
+    "input": "write 'hello world' on screen",
+    "plan": ["write 'hello world' on the lcd screen"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "POST", "URL": "/lcd", "body": {"message": "hello world"}}],
+    "result": ["The message 'hello world' has been written on the LCD screen."],
+    "previous_result": [{"message": "hello world"}]
+    },
+    
+    {
+    "input": "get the resistance",
+    "plan": ["read the potentiometer value"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "GET", "URL": "/potentiometer"}],
+    "result": ["The resistance of the potentiometer is 4200 Ohm."],
+    "previous_result": [{"resistance": "4200 Ohm"}]
+    },
+
+    {
+        "input": "write the resistance on screen",
+        "plan": [
+            "get the resistance",
+            "Write '4677 Ohm' on the screen"
+        ],
+        "index": 2,
+        "only_url": false,
+        "api": [
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "4677 Ohm"}}
+        ],
+        "result": [
+            "The resistance of the potentiometer is 4677 Ohm.",
+            "The message '4677 Ohm' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"resistance": "4677 Ohm"},
+            {"message": "4677 Ohm"}
+        ]
+    },
+
+    {
+        "input": "turn off the green led and write it on screen",
+        "plan": [
+            "turn off the green led",
+            "write on screen that the green led is off"
+        ],
+        "index": 2,
+        "only_url": false,
+        "api": [
+            {"method": "GET", "URL": "/led", "queries": {"color": "green", "state": "OFF"}},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "the green led is off"}}
+        ],
+        "result": [
+            "The green light has been turned off.",
+            "The message 'the green led is off' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"led_color": "GREEN", "state": "OFF"},
+            {"message": "the green led is off"}
+        ]
+    },
+
+    {
+        "input": "turn on all lights and at the end write on lcd 'done'",
+        "plan": [
+            "get a list of all lights",
+            "turn on all the lights in the list",
+            "write on lcd 'done'"
+            ],
+            "index": 2,
+            "only_url": true,
+            "api": [
+            {"method": "GET", "URL": "/get-all"},
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+            {"method": "GET", "URL": "/led", "queries": {"color": "GREEN", "state": "ON"}},
+            {"method": "GET", "URL": "/led", "queries": {"color": "BLUE", "state": "ON"}},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "done"}}
+        ],
+        "result": [
+            "The available lights are three LEDs: red (currently off), green (currently off), and blue (currently off).",
+            {"led_color": "RED", "state": "ON"},
+            {"led_color": "GREEN", "state": "ON"},
+            {"led_color": "BLUE", "state": "ON"},
+            {"message": "done"}
+        ],
+        "previous_result": [
+            {"lights": ["RED", "GREEN", "BLUE"]},
+            {"led_color": "RED", "state": "ON"},
+            {"led_color": "GREEN", "state": "ON"},
+            {"led_color": "BLUE", "state": "ON"},
+            {"message": "done"}
+        ]
+    },
+
+    {
+        "input": "if the resistance is greater than 5000, turn on the red light. else turn on the blue light. At the end write the resistance on screen",
+        "plan": [
+            "get the resistance",
+            "if greater than 5000, turn on the red light, else turn on the blue light",
+            "write on screen the resistance"
+        ],
+        "only_url": true,
+        "index": 2,
+        "api": [
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "5010 Ohm"}}
+        ],
+        "result": [
+            "The resistance of the potentiometer is 5010 Ohm.",
+            "The red light has been turned on.",
+            "The message '5010 Ohm' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"resistance": "5010 Ohm"},
+            {"led_color": "RED", "state": "ON"},
+            {"message": "5010 Ohm"}
+        ]
+    },
+
+    {
+        "input": "if the temperature is greater than 30 celsius degrees turn on the red light, else turn on the blue light",
+        "plan": [
+            "get the temperature in celsius",
+            "if the temperature in celsius is greater than 30 degrees, turn on the red light, else turn on the blue light"
+        ],
+        "only_url": true,
+        "api": [
+            {"method": "GET", "URL": "/temperature"},
+            {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
+        ],
+        "result": [
+            "The current temperature is 31\u00b0C",
+            "The red light has been turned on."
+        ],
+        "previous_result": [
+            {"celsius": 31.0},
+            {"led_color": "RED", "state": "ON"}
+        ],
+        "index": 2
+    },
+
+    {
+    "input": "if resistance is above 4000 turn on green led, else turn on red led",
+    "plan": [
+        "read potentiometer value",
+        "if above 4000 turn on green led, else turn on red led"
+    ],
+    "only_url": true,
+    "index": 3,
+    "api": [
+        {"method": "GET", "URL": "/potentiometer"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "GREEN", "state": "ON"}}
+    ],
+    "result": [
+        "The resistance of the potentiometer is 5100 Ohm.",
+        "The green light has been turned on."
+    ],
+    "previous_result": [
+        {"resistance": "5100 Ohm"},
+        {"led_color": "GREEN", "state": "ON"}
+    ]
+    },
+
+    {
+        "input": "if the screen has the word 'hello' on it and the resistance is less than 3000 print 'bye!', else print 'good'",
+        "plan": [
+            "get the resistance",
+            "check what is on screen",
+            "if the message on screen is 'hello' and the resistance is less than 3000 print 'bye!', else print 'good'"
+        ],
+        "only_url": true,
+        "api": [
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "GET", "URL": "/lcd"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "good"}}
+        ],
+        "result": [
+            "The resistance of the potentiometer is 2000 Ohm.",
+            "The message on the LCD screen is 'the resistance is 2000 Ohm'.",
+            "The message 'good' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"resistance": "2000 Ohm"},
+            {"message": "the resistance is 2000 Ohm"},
+            {"message": "good"}
+        ],        
+        "index": 3
+    },
+    
+    {
+    "input": "write 'alert' on screen",
+    "plan": ["write 'alert' on lcd"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "POST", "URL": "/lcd", "body": {"message": "alert"}}],
+    "result": ["The message 'alert' has been written on the LCD screen."],
+    "previous_result": [{"message": "alert"}]
+    },
+
+    {
+    "input": "if the message on lcd is 'alert', turn on red led",
+    "plan": [
+        "read message from lcd",
+        "if message is 'alert' turn on red led"
+    ],
+    "only_url": true,
+    "index": 3,
+    "api": [
+        {"method": "GET", "URL": "/lcd"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
+    ],
+    "result": [
+        "The message on the LCD screen is 'alert'.",
+        "The red light has been turned on."
+    ],
+    "previous_result": [
+        {"message": "alert"},
+        {"led_color": "RED", "state": "ON"}
+    ]
+    },
+
+    {
+        "input": "if the temperature is exactly 25 celsius degrees and the resistance is less than 2333 print 'nice', else print 'not bad'",
+        "plan": [
+            "get the temperature",
+            "get the resistance",
+            "if the temperature is exactly 25 celsius degrees and the resistance is less than 2333 print 'nice', else print 'not bad'"
+        ],
+        "only_url": true,
+        "index": 3,
+        "api": [
+            {"method": "GET", "URL": "/temperature"},
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "not bad"}}
+        ],
+        "result": [
+            "The current temperature is 31\u00b0C (86\u00b0F).",
+            "The resistance of the potentiometer is 2000 Ohm.",
+            "The nessage 'not bad' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"celsius": 31.0, "fahrenheit": 86.0},
+            {"resistance": "2000 Ohm"},
+            {"message": "not bad"}
+        ]
+    },
+
+    {
+    "input": "write 'start joking about you' on screen",
+    "plan": ["write 'start joking about you' on lcd"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "POST", "URL": "/lcd", "body": {"message": "start joking about you"}}],
+    "result": ["The message 'start joking about you' has been written on the LCD screen."],
+    "previous_result": [{"message": "start joking about you"}]
+    },
+
+    {
+    "input": "if temperature is exactly 22 and screen shows 'start', turn on blue led",
+    "plan": [
+        "read temperature",
+        "get lcd message",
+        "if temperature is 22 and message is 'start', turn on blue led"
+    ],
+    "only_url": true,
+    "index": 3,
+    "api": [
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/lcd"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "BLUE", "state": "ON"}}
+    ],
+    "result": [
+        "The current temperature is 22°C (71.6°F).",
+        "The message on the LCD screen is 'start joking about you'.",
+        "The blue light has been turned on."
+    ],
+    "previous_result": [
+        {"celsius": 22.0, "fahrenheit": 71.6},
+        {"message": "start joking about you"},
+        {"led_color": "BLUE", "state": "ON"}
+    ]
+    },
+
+    {
+    "input": "turn off the green light",
+    "plan": ["turn off the green led"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "GET", "URL": "/led", "queries": {"color": "green", "state": "OFF"}}],
+    "result": ["The green light has been turned off."],
+    "previous_result": [{"led_color": "GREEN", "state": "OFF"}]
+    },
+
+    {
+    "input": "if resistance is under 1500 and green led is off, turn it on",
+    "plan": [
+        "read resistance value",
+        "check green led status",
+        "if resistance < 1500 and led is off, turn on green led"
+    ],
+    "only_url": true,
+    "index": 3,
+    "api": [
+        {"method": "GET", "URL": "/potentiometer"},
+        {"method": "GET", "URL": "/led-status", "queries": {"color": "GREEN"}},
+        {"method": "GET", "URL": "/led", "queries": {"color": "GREEN", "state": "ON"}}
+    ],
+    "result": [
+        "The resistance of the potentiometer is 1200 Ohm.",
+        "The green light is currently off.",
+        "The green light has been turned on."
+    ],
+    "previous_result": [
+        {"resistance": "1200 Ohm"},
+        {"led_color": "GREEN", "state": "OFF"},
+        {"led_color": "GREEN", "state": "ON"}
+    ]
+    },
+
+        {
+    "input": "write 'low battery' on screen",
+    "plan": ["write 'low battery' on lcd"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "POST", "URL": "/lcd", "body": {"message": "low battery"}}],
+    "result": ["The message 'low battery' has been written on the LCD screen."],
+    "previous_result": [{"message": "low battery"}]
+    },
+
+    {
+    "input": "if lcd shows 'low battery' and temperature > 30, turn on red led and write 'danger'",
+    "plan": [
+        "get lcd message",
+        "get temperature",
+        "if message is 'low battery' and temperature > 30, turn on red led",
+        "if message is 'low battery' and temperature > 30 write 'danger'"
+    ],
+    "only_url": true,
+    "index": 3,
+    "api": [
+        {"method": "GET", "URL": "/lcd"},
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+        {"method": "POST", "URL": "/lcd", "body": {"message": "danger"}}
+    ],
+    "result": [
+        "The message on the LCD screen is 'low battery'.",
+        "The current temperature is 32°C (89.6°F).",
+        "The red light has been turned on.",
+        "The message 'danger' has been written on the LCD screen."
+    ],
+    "previous_result": [
+        {"message": "low battery"},
+        {"celsius": 32.0, "fahrenheit": 89.6},
+        {"led_color": "RED", "state": "ON"},
+        {"message": "danger"}
+    ]
+    },
+
+    {
+        "input": "write the resistance on screen",
+        "plan": [
+            "get the resistance",
+            "Write '2000 Ohm' on the screen"
+        ],
+        "index": 2,
+        "only_url": false,
+        "api": [
+            {"method": "GET", "URL": "/potentiometer"},
+            {"method": "POST", "URL": "/lcd", "body": {"message": "2000 Ohm"}}
+        ],
+        "result": [
+            "The resistance of the potentiometer is 2000 Ohm.",
+            "The message '2000 Ohm' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"resistance": "2000 Ohm"},
+            {"message": "2000 Ohm"}
+        ]
+    },
+
+    {
+        "input": "check for the temperature and the message on screen. if the temperature is greater than 20 celsius degrees and the message include the word 'demo' turn on the red light and write on screen 'done' and the celsius degrees you found. if temperature is greater than 20 celsius degrees and the message includes a number turn on the blue light. if the temperature is less than 20 celsius degrees turn on the red light",
+        "plan": [
+            "get the temperature",
+            "get the message on screen",
+            "if the temperature is greater than 20 celsius degrees and the message include the word 'demo' turn on the red light and write on screen 'done' and the celsius degrees you found. if temperature is greater than 20 celsius degrees and the message includes a number turn on the blue light. if the temperature is less than 20 celsius degrees turn on the red light"
+        ],
+        "only_url": true,
+        "index": 4,
+        "api": [
+            {"method": "GET", "URL": "/temperature"},
+            {"method": "GET", "URL": "/lcd"},
+            {"method": "GET", "URL": "/led", "queries": {"color": "blue", "state": "ON"}}
+        ],
+        "result": [
+            "The current temperature is 31\u00b0C (86\u00b0F).",
+            "The message on the LCD screen is 'the resistance is 2000 Ohm'.",
+            "The blue light has been turned on."
+        ],
+        "previous_result": [
+            {"celsius": 31.0, "fahrenheit": 86.0},
+            {"message": "the resistance is 2000 Ohm"},
+            {"led_color": "BLUE", "state": "ON"}
+        ]
+    },
+    {
+    "input": "if temperature is below 15 turn on blue light and write 'cold' on screen, otherwise turn on green light and write 'ok'",
+    "plan": [
+        "get the temperature",
+        "if temperature < 15, turn on blue light and write 'cold' on screen otherwise turn on green light and write 'ok'"
+    ],
+    "only_url": true,
+    "index": 4,
+    "api": [
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "green", "state": "ON"}},
+        {"method": "POST", "URL": "/lcd", "body": {"message": "ok"}}
+    ],
+    "result": [
+        "The current temperature is 20°C (68°F).",
+        "The green light has been turned on.",
+        "The message 'ok' has been written on the LCD screen."
+    ],
+    "previous_result": [
+        {"celsius": 20.0, "fahrenheit": 68.0},
+        {"led_color": "GREEN", "state": "ON"},
+        {"message": "ok"}
+    ]
+    },
+    {
+    "input": "if temperature is greater than 28 and resistance is below 3000, turn on blue led and print 'cool-low' on screen",
+    "plan": [
+        "get temperature",
+        "get resistance",
+        "if temperature > 28 and resistance < 3000, turn on blue led and write 'cool-low'"
+    ],
+    "only_url": true,
+    "index": 4,
+    "api": [
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/potentiometer"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "BLUE", "state": "ON"}},
+        {"method": "POST", "URL": "/lcd", "body": {"message": "cool-low"}}
+    ],
+    "result": [
+        "The current temperature is 29°C (84.2°F).",
+        "The resistance of the potentiometer is 2500 Ohm.",
+        "The blue light has been turned on.",
+        "The message 'cool-low' has been written on the LCD screen."
+    ],
+    "previous_result": [
+        {"celsius": 29.0, "fahrenheit": 84.2},
+        {"resistance": "2500 Ohm"},
+        {"led_color": "BLUE", "state": "ON"},
+        {"message": "cool-low"}
+    ]
+    },
+    
+    {
+    "input": "if screen shows 'cool-low' and temperature is below 18, turn on green led and print 'go' on screen, else turn on red led",
+    "plan": [
+        "read message from screen",
+        "get temperature",
+        "if lcd shows 'ready' and temperature < 18, turn on green led and write 'go'. else turn on red led"
+    ],
+    "only_url": true,
+    "index": 4,
+    "api": [
+        {"method": "GET", "URL": "/lcd"},
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}}
+    ],
+    "result": [
+        "The message on the LCD screen is 'cool-low'.",
+        "The current temperature is 20°C (68°F).",
+        "The red light has been turned on."
+    ],
+    "previous_result": [
+        {"message": "cool-low"},
+        {"celsius": 20.0, "fahrenheit": 68.0},
+        {"led_color": "RED", "state": "ON"}
+    ]
+    },
+
+        {
+    "input": "write 'heat mode' on screen",
+    "plan": ["write 'heat mode' on lcd"],
+    "only_url": false,
+    "index": 1,
+    "api": [{"method": "POST", "URL": "/lcd", "body": {"message": "heat mode"}}],
+    "result": ["The message 'heat mode' has been written on the LCD screen."],
+    "previous_result": [{"message": "heat mode"}]
+    },
+
+    {
+    "input": "if resistance < 2500 and temperature > 30 and lcd shows 'heat', turn on red led and print 'overheat'",
+    "plan": [
+        "read resistance value",
+        "read temperature",
+        "read lcd message",
+        "if all conditions met, turn on red led and print 'overheat'"
+    ],
+    "only_url": true,
+    "index": 4,
+    "api": [
+        {"method": "GET", "URL": "/potentiometer"},
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/lcd"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+        {"method": "POST", "URL": "/lcd", "body": {"message": "overheat"}}
+    ],
+    "result": [
+        "The resistance of the potentiometer is 2400 Ohm.",
+        "The current temperature is 33°C (91.4°F).",
+        "The message on the LCD screen is 'heat mode'.",
+        "The red light has been turned on.",
+        "The message 'overheat' has been written on the LCD screen."
+    ],
+    "previous_result": [
+        {"resistance": "2400 Ohm"},
+        {"celsius": 33.0, "fahrenheit": 91.4},
+        {"message": "heat mode"},
+        {"led_color": "RED", "state": "ON"},
+        {"message": "overheat"}
+        ]
+    },
+
+    {
+    "input": "check temperature and resistance. if temperature is above 28 and resistance is above 4000, turn on green led and print 'safe'. else turn on red led and print 'alert'",
+    "plan": [
+        "get temperature",
+        "get resistance",
+        "if temperature > 28 and resistance > 4000, turn on green led and write 'safe', else turn on red led and write 'alert'"
+    ],
+    "only_url": true,
+    "index": 4,
+    "api": [
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/potentiometer"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "RED", "state": "ON"}},
+        {"method": "POST", "URL": "/lcd", "body": {"message": "alert"}}
+    ],
+    "result": [
+        "The current temperature is 30°C (86°F).",
+        "The resistance of the potentiometer is 3500 Ohm.",
+        "The red light has been turned on.",
+        "The message 'alert' has been written on the LCD screen."
+    ],
+    "previous_result": [
+        {"celsius": 30.0, "fahrenheit": 86.0},
+        {"resistance": "3500 Ohm"},
+        {"led_color": "RED", "state": "ON"},
+        {"message": "alert"}
+    ]
+    },
+
+    {
+        "input": "write the 'alert' on screen",
+        "plan": [
+            "Write 'alert' on the screen"
+        ],
+        "index": 1,
+        "only_url": false,
+        "api": [
+            {"method": "POST", "URL": "/lcd", "body": {"message": "alert"}}
+        ],
+        "result": [
+            "The message 'alert' has been written on the LCD screen."
+        ],
+        "previous_result": [
+            {"message": "alert"}
+        ]
+    },
+
+    {
+    "input": "if lcd says 'alert' and temperature equals 27 and resistance is below 2000, turn on blue led and show 'go now'",
+    "plan": [
+        "read lcd message",
+        "read temperature",
+        "read resistance",
+        "if lcd='alert' and temp==27 and resistance<2000, turn on blue led",
+        "if lcd='alert' and temp==27 and resistance<2000, write 'go now'"
+    ],
+    "only_url": true,
+    "index": 4,
+    "api": [
+        {"method": "GET", "URL": "/lcd"},
+        {"method": "GET", "URL": "/temperature"},
+        {"method": "GET", "URL": "/potentiometer"},
+        {"method": "GET", "URL": "/led", "queries": {"color": "BLUE", "state": "ON"}},
+        {"method": "POST", "URL": "/lcd", "body": {"message": "go now"}}
+    ],
+    "result": [
+        "The message on the LCD screen is 'alert'.",
+        "The current temperature is 27°C (80.6°F).",
+        "The resistance of the potentiometer is 1500 Ohm.",
+        "The blue light has been turned on.",
+        "The message 'go now' has been written on the LCD screen."
+    ],
+    "previous_result": [
+        {"message": "alert"},
+        {"celsius": 27.0, "fahrenheit": 80.6},
+        {"resistance": "1500 Ohm"},
+        {"led_color": "BLUE", "state": "ON"},
+        {"message": "go now"}
+    ]
+    }
+
+
+]

@@ -15,7 +15,7 @@
 String readLCD();
 String writeLCD(String message);
 void clearLine(int line);
-float getTemperature(bool celcius);
+float getTemperature(bool celsius);
 int getPotentiometer();
 int getAll();
 void setLedPins();

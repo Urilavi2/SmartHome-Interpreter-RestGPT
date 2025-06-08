@@ -15,3 +15,5 @@ esp32/*
 !esp32/pinout-UPside-esp32-NodeMCU-32S.jpg
 !esp32/pinout-downside-esp32-NodeMCU-32S.jpg
 graph.png
+datasets/outputs/*
+!datasets/outputs/.gitkeep

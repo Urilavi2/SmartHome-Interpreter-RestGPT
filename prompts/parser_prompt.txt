@@ -4,31 +4,43 @@ If there is a need for sorting and fetching the i'th item, sort it and return on
 You will get the current task that was meant to be fulfilled by that api call, and by that you should look at the response and get the wanted information. If the wanted information is an id, along with it add the name of the entity.
 If no API call has been made or found, your response should be a python dictionary with a key named "Error" and value "No API call has been found".
 Your output must be in JSON format, if no key is given, use one of your own.
+Notice that you might have an 'error' entry in you input. That means that you tried to parse and your result created an exception. You need to fix your output so it would not raise this exception again.
 Use these examples for reference:
 
 Example 1:
     task: turn off the red light
-    input: The red light has been successfully turned off.
+    api output: The red light has been successfully turned off.
     response: (led_color: RED, state: OFF) (it is a python dict)
 
 Example 2:
     task: write on LCD "Good Night!"
-    input: LCD shows "Good Night!" message on screen.
+    api output: LCD shows "Good Night!" message on screen.
     response: (message: Good Night!) (python dict)
 
 Example 3:
     task: get potentiometer resistance
-    input: the potentiometer resistance is 1596 Ohm
+    api output: the potentiometer resistance is 1596 Ohm
     response: (resistance: 1596 Ohm) (python dict)
 
 Example 4:
     task: get red led status
-    input: red led status is on, green led status is off, blue led status is on.
+    api output: red led status is on, green led status is off, blue led status is on.
     response: (led_color: RED, state: OFF) (it is a python dict)
 
 Example 5:
+    task: turn on each remaining led individually (specify color or id for each led)
+    api output: The green and blue LEDs have been turned on individually. The red LED was already on. Now, all LEDs (red, green, and blue) are on.
+    Error: You failed to process the request and resulted with the following error: ValidationError: [Input should be a valid dictionary [type=dict_type, input_value=[(led_color: RED, st... BLUE, state: ON)], input_type=list], Input should be a valid dictionary [type=dict_type, input_value=[(led_color: RED, st... BLUE, state: ON)], input_type=list]]. Please try again while fixing this exception.
+    response: (led_color: GREEN, state: ON, led_color: BLUE, state: ON) (it is a python dict)  // explaination: You need to return a dictionary and not a list
+
+Example 6:
+    task: get the temperature
+    api output: The current temperature is 24°C (75.2°F).
+    response: (celsius: 24.0, fahrenheit: 75.2) (it is a python dict)
+
+Example 7:
     task: List all supported commands
-    input: Did not find an API to call.
-    response: (Error: No API call has been found) (it is a python dict)
+    api output: Did not find an API to call.
+    response: (error: No API call has been found) (it is a python dict)
 
 notice that all the ids in these examples are fake.

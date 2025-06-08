@@ -3,16 +3,17 @@ import logging
 from PIL import Image
 from langgraph.graph import END, StateGraph, START
 from utils.tools import http_toolkit
+from utils.debugOptions import DebugOptions
 from langchain_openai import ChatOpenAI
 from prompts.prompts import Prompts
 from langgraph.prebuilt import create_react_agent
-from models.blocks import PlanModel, ParserModel, EndpointModel, ActModel, PlanExecute, DecisionModel
+from models.blocks import PlanModel, ParserModel, EndpointModel, PlanExecute, DecisionModel, CallerTestModel
 
 
 logger = logging.getLogger(__name__)
 
 class Workflow:
-    def __init__(self, prompts: Prompts):
+    def __init__(self, prompts: Prompts, subject=""):
         self.prompts = prompts
         self.llm_model = os.environ.get("LLM_MODEL", None)
         self.llm = ChatOpenAI(model=self.llm_model, temperature=0.0)
@@ -25,26 +26,50 @@ class Workflow:
         self.decider = prompts.decider | self.llm.with_structured_output(DecisionModel)
 
         self.replanner = prompts.replanner | self.llm.with_structured_output(PlanModel)
+
+        self.caller_test = prompts.caller_test | self.llm.with_structured_output(CallerTestModel)
         
         self.state = StateGraph(PlanExecute)
-        self.configure_workflow()    
+        self.configure_workflow(subject)    
         self.app = self.state.compile()
 
 
-    def configure_workflow(self):
-        self.state.add_node("Planner", self.plan_step)
-        self.state.add_edge(START, "Planner")
-        self.state.add_node("API Selector", self.api_selector_step)
-        self.state.add_edge("Planner", "API Selector")
-        self.state.add_node("Executor", self.caller_step)
-        self.state.add_edge("API Selector", "Executor")
-        self.state.add_node("Parser", self.parser_step)
-        self.state.add_edge("Executor", "Parser")
-        self.state.add_node("Replan", self.replan_step)
-        self.state.add_edge("Parser", "Decider")
-        self.state.add_node("Decider", self.decider_step)
-        self.state.add_conditional_edges("Decider", self.should_end, ["Replan", END])
-        self.state.add_edge("Replan", "API Selector")
+    def configure_workflow(self, subject):
+        if not subject or subject.lower() in ["full", "all"]:
+            self.state.add_node("Planner", self.plan_step)
+            self.state.add_edge(START, "Planner")
+            self.state.add_node("API Selector", self.api_selector_step)
+            self.state.add_edge("Planner", "API Selector")
+            self.state.add_node("Executor", self.caller_step)
+            self.state.add_edge("API Selector", "Executor")
+            self.state.add_node("Parser", self.parser_step)
+            self.state.add_edge("Executor", "Parser")
+            self.state.add_node("Replan", self.replan_step)
+            self.state.add_edge("Parser", "Decider")
+            self.state.add_node("Decider", self.decider_step)
+            self.state.add_conditional_edges("Decider", self.should_end, ["Replan", END])
+            # self.state.add_edge("Replan", "API Selector")
+            self.state.add_conditional_edges("Replan", self.should_end_replan, ["API Selector", END])
+        
+        elif subject.lower() == "planner":
+            self.state.add_node("Planner", self.plan_step)
+            self.state.add_edge(START, "Planner")
+            self.state.add_edge("Planner", END)
+
+        elif subject.lower() == "api_selector":
+            self.state.add_node("API Selector", self.testing_api_selector)
+            self.state.add_edge(START, "API Selector")
+            self.state.add_edge("API Selector", END)
+        
+        elif subject.lower() == "caller":
+            self.state.add_node("Caller", self.testing_caller_step)
+            self.state.add_edge(START, "Caller")
+            self.state.add_edge("Caller", END)
+
+        elif subject.lower() == "parser":
+            self.state.add_node("Parser", self.testing_parser_step)
+            self.state.add_edge(START, "Parser")
+            self.state.add_edge("Parser", END)            
 
     async def plan_step(self, state: PlanExecute):
         try:
@@ -57,13 +82,15 @@ class Workflow:
             logger.runlog(f"Error in planning step: {e}")
             print(f"Error in planning step: {e}")
             print(f"Could not plan the task. Please check the input and try again.")
-            print("Exiting the program.")
-            exit(1)
+            raise e("Planning failed. Please check the input and try again.")
 
     async def api_selector_step(self, state: PlanExecute):
         tryCount = 0
         while True:
             try:
+                if not state["plan"]:
+                    logger.runlog(f"No more tasks to process. Exiting...")
+                    raise ValueError("No more tasks to process.")
                 task = state["plan"][0]
                 logger.runlog(f"The current step: {task}")
                 endpoint = await self.api_selector.ainvoke({"messages": [("user",task)]})
@@ -73,15 +100,23 @@ class Workflow:
             except Exception as e:
                 tryCount += 1
                 logger.runlog(f"Error in API Selector step: {e}")
-                print(f"Error in API Selector step: {e}")
-                print(f"Could not select the API. Trying again...")
+                if DebugOptions() != "off":
+                    print(f"Error in API Selector step: {e}")
+                    print(f"Could not select the API. Trying again...")
                 if tryCount == 3:
                     print(f"API Selector failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
-                    exit(2)
+                    raise e("API Selector failed after 3 tries. ")
             if tryCount < 3:
                 continue
-        
+
+    async def testing_api_selector(self, state: PlanExecute):
+        try:
+            endpoint = await self.api_selector.ainvoke({"messages": [("user", state["input"])]})
+            return {"api": [endpoint.endpoint]}
+        except Exception as e:
+            print(e)
+
     async def caller_step(self, state: PlanExecute):
         tryCount = 0
         while True:
@@ -100,21 +135,33 @@ class Workflow:
             except Exception as e:
                 tryCount += 1
                 logger.runlog(f"Error in API Caller step: {e}")
-                print(f"Error in API Caller step: {e}")
-                print(f"Could not call the API. Trying again...")
+                if DebugOptions() != "off":
+                    print(f"Error in API Caller step: {e}")
+                    print(f"Could not call the API. Trying again...")
                 if tryCount == 3:
                     print(f"API Caller failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
-                    exit(3)
+                    raise e("Caller failed after 3 tries. ")
             if tryCount < 3:
                 continue
+                
+    async def testing_caller_step(self, state: PlanExecute):
+        try:
+            calling = await self.agent_caller.ainvoke({"messages": [("user", str(state["input"]))]})
+            return {"current_agent_answer": [calling["messages"][-1].content]}
+        except Exception as e:
+            print(e)
 
     async def parser_step(self, state: PlanExecute):
         tryCount = 0
+        error = ""
         while True:
             try:
                 task = state["plan"][0]
-                input_for_parser = {"task": task, "api output": state["current_agent_answer"]}
+                input_for_parser = {"task": task, "api output": state["current_agent_answer"], "error": error}
+                if not error:
+                    input_for_parser.pop("error", None)
+                logger.runlog(f"Parser Input:\n---------------\nParser input: {input_for_parser}")
                 parse = await self.parser.ainvoke({"messages": [("user", str(input_for_parser))]})
                 logger.runlog(f"Parser Response:\n---------------\n\
                             {parse.res}")
@@ -123,14 +170,25 @@ class Workflow:
             except Exception as e:
                 logger.runlog(f"Error in Parser step: {e}")
                 tryCount += 1
-                print(f"Error in Parser step: {e}")
-                print(f"Could not parse the API response. Trying again...")
+                if DebugOptions() != "off":
+                    print(f"Error in Parser step: {e}")
+                    print(f"Could not parse the API response. Trying again...")
+                if e.__class__.__name__ == 'ValidationError':
+                    error = (f"You failed to process the request and resulted with the following error: {e.__class__.__name__}: "
+                    f"{str([f"{err.get("msg", "No msg")} [type={err.get("type", "No type")}, input_value={str(err.get("input", "No input"))}, input_type={str(type(err.get("input", "No input")))}]" for err in e.errors()])}"
+                        ". Please try again while fixing this exception.")
                 if tryCount == 3:
                     print(f"Parser failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
-                    exit(4)
+                    raise e("Parser failed after 3 tries. ")
             if tryCount < 3:
                 continue
+
+    async def testing_parser_step(self, state: PlanExecute):
+        task = state["input"]["task"]
+        input_for_parser = {"task": task, "api output": state["input"]["api output"]}
+        parse = await self.parser.ainvoke({"messages": [("user", str(input_for_parser))]})
+        return {"current_agent_answer": dict(parse.res), "past_steps": [(task, str(parse.res))]}
 
     async def decider_step(self, state: PlanExecute):
         try:
@@ -156,11 +214,12 @@ class Workflow:
         except Exception as e:
             tryCount += 1
             logger.runlog(f"Error in Decider step: {e}")
-            print(f"Error in Decider step: {e}")
+            if DebugOptions() != "off":
+                print(f"Error in Decider step: {e}")
             if tryCount == 3:
                 print(f"Could not decide what to do. Please check the input and try again.")
                 print("Exiting the program.")
-                exit(6)
+                raise e("Decider failed after 3 tries. ")
 
     async def replan_step(self, state: PlanExecute):
         tryCount = 0
@@ -173,13 +232,20 @@ class Workflow:
         except Exception as e:
             tryCount += 1
             logger.runlog(f"Error in Replan step: {e}")
-            print(f"Error in Replan step: {e}")
-            print(f"Could not replan the task. Trying again...")
+            if DebugOptions() != "off":
+                print(f"Error in Replan step: {e}")
+                print(f"Could not replan the task. Trying again...")
             if tryCount == 3:
                 print(f"Replan failed after {tryCount} tries. Exiting...")
                 print("Please check your API URL and internet connection and try again.")
-                exit(5)
-           
+                raise e("Replan failed after 3 tries. ")
+    
+    def should_end_replan(self, state: PlanExecute):
+        if state["plan"][0] == "done":
+            return END
+        else:
+            return "API Selector"
+
     def should_end(self, state: PlanExecute):
         if "final" in state and state["final"]:
             logger.runlog(f"Final Response: {state["final"]}")
@@ -187,7 +253,8 @@ class Workflow:
         else:   
             return "Replan"
         
-        
+
+
     def create_graph(self, g: StateGraph.compile):
         a = g.get_graph(xray=True).draw_mermaid_png()
         with open("graph.png", "wb") as f:
