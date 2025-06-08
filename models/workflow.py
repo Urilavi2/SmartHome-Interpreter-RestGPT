@@ -34,7 +34,7 @@ class Workflow:
 
 
     def configure_workflow(self, subject):
-        if not subject or subject.lower() == "full":
+        if not subject or subject.lower() in ["full", "all"]:
             self.state.add_node("Planner", self.plan_step)
             self.state.add_edge(START, "Planner")
             self.state.add_node("API Selector", self.api_selector_step)
@@ -47,7 +47,8 @@ class Workflow:
             self.state.add_edge("Parser", "Decider")
             self.state.add_node("Decider", self.decider_step)
             self.state.add_conditional_edges("Decider", self.should_end, ["Replan", END])
-            self.state.add_edge("Replan", "API Selector")
+            # self.state.add_edge("Replan", "API Selector")
+            self.state.add_conditional_edges("Replan", self.should_end_replan, ["API Selector", END])
         
         elif subject.lower() == "planner":
             self.state.add_node("Planner", self.plan_step)
@@ -80,8 +81,7 @@ class Workflow:
             logger.runlog(f"Error in planning step: {e}")
             print(f"Error in planning step: {e}")
             print(f"Could not plan the task. Please check the input and try again.")
-            print("Exiting the program.")
-            exit(1)
+            raise e("Planning failed. Please check the input and try again.")
 
     async def api_selector_step(self, state: PlanExecute):
         tryCount = 0
@@ -101,7 +101,7 @@ class Workflow:
                 if tryCount == 3:
                     print(f"API Selector failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
-                    exit(2)
+                    raise e("API Selector failed after 3 tries. ")
             if tryCount < 3:
                 continue
 
@@ -135,7 +135,7 @@ class Workflow:
                 if tryCount == 3:
                     print(f"API Caller failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
-                    exit(3)
+                    raise e("Caller failed after 3 tries. ")
             if tryCount < 3:
                 continue
                 
@@ -152,6 +152,7 @@ class Workflow:
             try:
                 task = state["plan"][0]
                 input_for_parser = {"task": task, "api output": state["current_agent_answer"]}
+                logger.runlog(f"Parser Input:\n---------------\nParser input: {input_for_parser}")
                 parse = await self.parser.ainvoke({"messages": [("user", str(input_for_parser))]})
                 logger.runlog(f"Parser Response:\n---------------\n\
                             {parse.res}")
@@ -165,7 +166,7 @@ class Workflow:
                 if tryCount == 3:
                     print(f"Parser failed after {tryCount} tries. Exiting...")
                     print("Please check your API URL and internet connection and try again.")
-                    exit(4)
+                    raise e("Parser failed after 3 tries. ")
             if tryCount < 3:
                 continue
 
@@ -203,7 +204,7 @@ class Workflow:
             if tryCount == 3:
                 print(f"Could not decide what to do. Please check the input and try again.")
                 print("Exiting the program.")
-                exit(6)
+                raise e("Decider failed after 3 tries. ")
 
     async def replan_step(self, state: PlanExecute):
         tryCount = 0
@@ -221,8 +222,14 @@ class Workflow:
             if tryCount == 3:
                 print(f"Replan failed after {tryCount} tries. Exiting...")
                 print("Please check your API URL and internet connection and try again.")
-                exit(5)
-           
+                raise e("Replan failed after 3 tries. ")
+    
+    def should_end_replan(self, state: PlanExecute):
+        if state["plan"][0] == "done":
+            return END
+        else:
+            return "API Selector"
+
     def should_end(self, state: PlanExecute):
         if "final" in state and state["final"]:
             logger.runlog(f"Final Response: {state["final"]}")

@@ -92,60 +92,6 @@
         ]
       }
     },
-    "/led/toggle": {
-      "get": {
-        "tags": [
-          "SmartHome"
-        ],
-        "operationId": "GET_led_toggle",
-        "summary": "Toggle LED",
-        "description": "Toggle the LED with the given color.",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/led-result-object"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/trait_standardErrors_404"
-          }
-        },
-        "parameters": [
-          {
-            "name": "color",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Specify the color of the led to toggle."
-          },
-          {
-            "name": "repeat",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1
-            },
-            "description": "Specify how many times to toggle that led."
-          },
-          {
-            "name": "repeat-period",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1
-            },
-            "description": "Specify the period of a clock cycle between turned on led to the next turn on."
-          }
-        ]
-      }
-    },
     "/lcd": {
       "get": {
         "tags": [

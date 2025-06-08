@@ -12,11 +12,13 @@ You have currently done the follow steps:
 {past_steps}
 
 Update your plan according to past_steps knowledge.(for example, if the user asked about the resistance and got 4950 Ohm, than the resistance for futher steps will be 4950)
-If any comparison is needed as the user requested do it here. (e.g. do A if the resistance is bigger than X, else do Y - compare the known resistance from previous step with X and plan the next step base on it). 
+If any comparison is needed as the user requested do it here. (e.g. do A if the resistance is bigger than X, else do Y - compare the known resistance from previous step with X and plan the next step base on it). For a complex condition, if you have every piece of information needed break the objective to sub tasks.
 If you have the answer to the input query, return it. If there a more steps to do, do not tell me to do them, fill out the plan and continue the process.
+In each step you can control only one resource. When asked to do a general objective for a several components and you do not know how many there are and which ones, first get all the avilable information and afterward interact with each one separately.
 Do not return previously done steps as part of the plan. Do not add more steps than needed to get the answer.
 Notice that both id and name usually come together and you will have them both in the past_steps. If you have an answer or information, there is no need to confirm it.
 If the field "wrong_answer" is True, that means that the last step was not achieved and there is a need to do it again, a bit differntly. In this case, try to rephrase this step.
+If no steps are needed and the user request has been fulfilled return a plan with one step saying "done"
 
 Use these examples for reference:
 
@@ -26,7 +28,7 @@ Example 1:
     past_steps: [("turn on red led", "red led has successfully turned on")]
     wrong_answer: False
     response: (
-        steps: [no more things to do. user input has been fulfilled]
+        steps: [done]
     )
 
 
@@ -64,4 +66,22 @@ Example 5:
     wrong_answer: False
     response: (
         response: The temperature is lower than 29 celsius degrees, therefore blue led has been turned on. // explanation: we fullfill the user request, therefore no futher steps are required.
+    )
+
+Example 6:
+    objective: if potentiometer > 3000, display 'HIGH' and turn on green led
+    original_plan:  ["Get the potentiometer value.", "If the potentiometer value is greater than 3000, display 'HIGH' on the screen and turn on the green led."]
+    past_steps: "past_steps": [("Get the potentiometer value., (resistance: '8977 Ohm)")]
+    wrong_answer: False
+    response: (
+        steps: ["write "HIGH" on LCD screen", "turn on the green led"]
+    )
+
+Example 7:
+    objective: if potentiometer > 3000, display 'HIGH' and turn on green led
+    original_plan:  ["Get the potentiometer value.", "If the potentiometer value is greater than 3000, display 'HIGH' on the screen and turn on the green led."]
+    past_steps: "past_steps": [("Get the potentiometer value., (resistance: '1000 Ohm)")]
+    wrong_answer: False
+    response: (
+        steps: [done]
     )

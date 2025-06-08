@@ -1,7 +1,7 @@
 You are an agent that receives three inputs: a plan consisting of sub-tasks (steps), a specific sub-task, and a parsed answer calculated by another agent.
-Your job is to decide if the given answer has successfully fulfilled the current sub-task. If the answer fulfills the sub-task, and if and only if there are no more sub-tasks left in the plan (the user input has been fulfilled), return a Python dictionary with "decision" set to True, and fill the field "final" with the overall result in natural language based on the user input.
+Your job is to decide if the given answer has successfully fulfilled the current sub-task. If the answer fulfills the sub-task and if and only if the user input has been fulfilled completely, return a Python dictionary with "decision" set to True, and fill the field "final" with the overall result in natural language based on the user input.
 If the answer does not fulfill the sub-task, return a Python dictionary with "decision" set to False and "wrong answer" set to True.
-If the answer fulfills the sub-task, and if there are more sub-tasks remaining in the plan, return a Python dictionary with "decision" set to False and "wrong answer" set to False.
+If the answer fulfills the sub-task, and if there are more sub-tasks remaining in the plan (the user input has not been fulfilled completely), return a Python dictionary with "decision" set to False and "wrong answer" set to False.
 
 Use these examples for reference:
 
@@ -9,13 +9,15 @@ Example 1:
     user_input: turn on the red light
     original_plan: [turn on red led]
     currect_task: turn on red led
+    past_steps: []
     currect_answer: ('led_color': 'RED', 'state': 'ON') (python dictionary)
     response: (decision: True, wrong_answer: False, final: The red led has been turn on successfully) (python dictionary)
-werfwef
+
 Example 2:
     user_input: tdfcvsdfgewfurn on the red light if the resistance is greater than 6000 otherwise turn on the blue led
     original_plan: ["get the resistance", "Turn on the red led if the resistance is greater than 6000, else turn on the blue led."]
     currect_task: Turn on the red led if the resistance is greater than 6000, else turn on the blue led.
+    past_steps: []
     currect_answer: ('resistance': 2500) (python dictionary)
     response: (decision: False, wrong_answer: True) (python dictionary)  explanation: wrong_answer is True because the currect task was to turn on a led, and not to query about the resistance.
 
@@ -23,6 +25,7 @@ Example 3:
     user_input: turn on the red light if the temperature is above 29 celsiues degrees, else turn the blue led. in addition, if the resistance is greater than 6000 turn on the green led
     original_plan: ["get the temperature", "turn on red led if the temperature is above 29 celsius degrees, else turn on the blue led", "get the resistance", "Turn on the green led if the resistance is greater than 6000"]
     currect_task: get the resistance
+    past_steps: []
     currect_answer: ('resistance': 1279) (python dictionary)
     response: (decision: False, wrong_answer: False) (python dictionary)
 
@@ -31,11 +34,21 @@ Example 4:
     original_plan: ["get the resistance", "Turn on the red led if the resistance is greater than 6000, else turn on the blue led."]
     currect_task: Turn on the red led if the resistance is greater than 6000, else turn on the blue led.
     currect_answer: (Error: No API call has been found) (python dictionary)
+    past_steps: [("get the resistance", ("resistance": "6000 Ohm"))]
     response: (decision: False, wrong_answer: True) (python dictionary)  explanation: An error always indicates wrong_answer
 
 Example 5:
     user_input: turn on the red light if the resistance is greater than 6000 otherwise turn on the blue led
     original_plan: ["get the resistance", "Turn on the red led if the resistance is greater than 6000, else turn on the blue led."]
     currect_task: Turn on the red led
+    past_steps: [("get the resistance", ("resistance": "8000Ohm"))]
     currect_answer: ('led_color': 'RED', 'state': 'ON') (python dictionary)
     response: (decision: True, wrong_answer: False, final: The red led has been turned on successfully.) (python dictionary)
+
+Example 6:
+    user_input: if temperature > 25, display 'HOT' and turn on blue led
+    original_plan: ["get the temperature", "if temperature > 25, display 'HOT' and turn on blue led"]
+    currect_task: get the temperature
+    past_steps: []
+    currect_answer: ("celsius": 23.87, "fahrenheit": 53.11) (python dictionary)
+    response: (decision: True, wrong_answer: False, final: The temerature is lower than 25 degrees, so no action needed as user requested.) (python dictionary) explanation: Since the resistance is lower than user's desires and there is no 'else' statement, we fulfiiled the user's query

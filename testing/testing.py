@@ -9,6 +9,7 @@ from testing.caller import caller
 from testing.parser import parser
 from utils.tools import progress_bar
 import json
+from time import sleep
 
 async def tests(subject):
     _ = load_dotenv(find_dotenv())
@@ -62,7 +63,7 @@ async def all(workflow, input_file, config, output_file, timestamp):
     if inputs_json is None:
         print(f"Input file {input_file} is empty or not found.")
         return
-    for query_idx in range(0, len(inputs_json), 10):
+    for query_idx in range(0, len(inputs_json)):
         query = inputs_json[query_idx]
         index = int(query.get("index", 0))
         progress_bar(query_idx + 1, len(inputs_json), prefix="Running all tests", length=50)
@@ -74,17 +75,31 @@ async def all(workflow, input_file, config, output_file, timestamp):
             print("Input is empty, skipping this query.")
             continue
         answers = []
-        async for event in workflow.app.astream(inputs, config=config):
-            for k, v in event.items():
-                if k == "Parser":
-                    answers.append(v.get("current_agent_answer", {}))
-                elif k == "Decider" and v.get("final", ""):
-                     answers.append(v.get("final"))
-        
+        while True:
+            try:
+                async for event in workflow.app.astream(inputs, config=config):
+                    for k, v in event.items():
+                        if k == "Parser":
+                            answers.append(v.get("current_agent_answer", {}))
+                        elif k == "Decider" and v.get("final", ""):
+                            answers.append(v.get("final"))
+            except Exception as e:
+                print(f"\n\nError processing query {query_idx}: {e}\n\n")
+                if e.get("error", {}).get("code", "") == "rate_limit_exceeded":
+                    print(f"'Rate limit reached for {os.environ.get("LLM_MODEL", "LLM")}, trying again in 1 min.")
+                    sleep(60)
+                    continue
+                else:
+                    print(f"An error occurred: {e}")
+                    break
+            finally:
+                break
+            
         with open(output_file, 'a') as f:
             f.write(f"{'*' * 20}\n\nQuery: {query.get('input', '')}\nIndex: {index}\nAnswers:\n")
             for answer in answers:
                 f.write(json.dumps(answer, indent=4))
                 f.write("\n")
             f.write("\n" + "*" * 20 + "\n\n")
+        answers.clear()
     print(f"All tests completed. Results saved to {output_file}.")
