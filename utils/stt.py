@@ -24,9 +24,14 @@ class SpeechToText(Singleton):
         mic_pattern = re.compile(rf"{mic_name}")
         for mic in sd.query_devices():
             if re.search(mic_pattern, mic['name']):
+                print(mic)
                 optionals.append(mic['index'])
         if not optionals:
             return [self.__defaultMic()]
+        # overwriting order because of weird issue
+        temp = optionals[0]
+        optionals = optionals[1:]
+        optionals.append(temp)
         return optionals
         
     def __defaultMic(self):
