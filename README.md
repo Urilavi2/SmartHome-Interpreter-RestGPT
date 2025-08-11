@@ -104,9 +104,10 @@ The system was evaluated with 50 test queries across four complexity levels:
 
 ## Contributors
 
-- **Student**: Uri Lavi (urila@post.bgu.ac.il)
+- **Student**: Uri Lavi (urila@post.bgu.ac.il | urilavi2@gmail.com)
 - **Advisor**: Prof. Chen Avin
-- **Institution**: Ben-Gurion University of the Negev, Faculty of Engineering Science
+- **Counsellor**: Gilad Saban
+- **Institution**: Ben-Gurion University of the Negev, Dept. of Electrical and Computer Engineering
 
 ## References
 
