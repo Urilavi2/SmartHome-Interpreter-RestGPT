@@ -62,7 +62,7 @@ The system consists of three main components:
 | `/led/{led_color}` | GET/POST | Control LED state and color | `{"status": "on", "color": "red"}` |
 | `/lcd` | POST | Display message on LCD | `{"message": "text"}` |
 | `/temperature` | GET | Get temperature reading | `{"celsius": 24.5, "fahrenheit": 76.1}` |
-| `/potentiometer` | GET | Read resistance value | `{"value": 512}` |
+| `/potentiometer` | GET | Read resistance value | `{"resistance": 512}` |
 | `/get-all` | GET | Fetch all device statuses | Combined device status JSON |
 
 ## Testing Results
